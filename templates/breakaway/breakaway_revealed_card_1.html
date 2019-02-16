@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="row">
+    <div class="col offset-sm-3 mb-5">
+        <h1 class="bd-title">Your Cards</h1>
+    </div>
+</div>
+
+
+
+        <div class="row">
+
+            <div class="col-sm-3 offset-sm-3 col-6">
+
+                    <div class="card-shape {{ chosen_cards[0][2] }}">
+                        <span class="{% if "S" == chosen_cards[0][1] %}
+                            mini-letter
+                        {% else %}mini-letter-square
+                        {% endif %}">{{ chosen_cards[0][1] }}</span>
+                        <p>{{ chosen_cards[0][0] }}</p>
+                    </div>
+
+            </div>
+
+        </div><!--endrow-->
+        <div class="row mt-5">
+            <div class="col-sm-3 offset-sm-3 col-6">
+                <a href="{{ url_for('breakaway.breakaway_picker_2') }}" class="btn btn-primary btn-lg exhaust-button">Choose Second<br>Breakaway Card</a>
+            </div>
+        </div><!--endrow-->
+
+
+    </form>
+
+{% endblock %}

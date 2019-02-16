@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-133223761-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-133223761-1');
+        </script>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='custom.css') }}">
+    <title>Flamme Rouge Dealer</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark navbar-expand-md">
+        <a class="navbar-brand" href="#">Flamme Rouge Dealer</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="navbar-item">
+                    <a href="/" class="nav-link">New Game</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row pt-1">
+            <div class="col-md-2">
+            {% if session['round'] %}
+                <button type="button" class="btn btn-secondary mt-2">Round: {{ session['round'] }}</button>
+            {% endif %}
+            </div>
+
+        </div><!--end row -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-danger m-5" role="alert">
+                    {% for message in messages %}
+                        <p class="mb-0">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block body %} {% endblock %}
+
+        {% if session['view_played'] %}
+        <div class="row mt-5">
+
+            <div class="col-md-3 col-sm">
+                <span class="played_cards"><strong>Played Cards: </strong></span>
+            </div>
+            <div class="col-md-3 col-sm">
+                <span class="played_cards">{{ session['deck_1']['name'] }} -
+                    {% for played in session['deck_1']['discards'] %}
+                        {% if 'exhaustion-card' in played %}
+                            <span class="exhaust-number">
+                        {% endif %}
+                        {{ played[0] }}
+                        {% if 'exhaustion-card' in played %}
+                            </span>
+                        {% endif %}
+                    {% endfor %}</span>
+             </div>
+             <div class="col-md-3 col-sm">
+                <span class="played_cards">{{ session['deck_2']['name'] }} - {% for played in session['deck_2']['discards'] %} {% if 'exhaustion-card' in played %}<span class="exhaust-number">{% endif %} {{ played[0] }} {% if 'exhaustion-card' in played %}</span>{% endif %} {% endfor %}</span>
+            </div>
+
+        </div><!--end row-->
+        <div class="row">
+
+            <div class="col-md-3 col-sm">
+                <span class="played_cards"><strong>Recycled Cards: </strong></span>
+            </div>
+            <div class="col-md-3 col-sm">
+                <span class="played_cards">{{ session['deck_1']['name'] }} - {% for played in session['deck_1']['recycled'] %} {% if 'exhaustion-card' in played %}<span class="exhaust-number">{% endif %} {{ played[0] }} {% if 'exhaustion-card' in played %}</span>{% endif %} {% endfor %}</span>
+             </div>
+             <div class="col-md-3 col-sm">
+                <span class="played_cards">{{ session['deck_2']['name'] }} - {% for played in session['deck_2']['recycled'] %} {% if 'exhaustion-card' in played %}<span class="exhaust-number">{% endif %} {{ played[0] }} {% if 'exhaustion-card' in played %}</span>{% endif %} {% endfor %}</span>
+            </div>
+
+        </div><!--end row-->
+
+
+        {% endif %}
+    </div>
+
+
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    {% block script %} {% endblock %}
+  </body>
+
+</html>
