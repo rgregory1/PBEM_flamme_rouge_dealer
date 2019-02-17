@@ -13,6 +13,7 @@ import pathlib
 from functions import *
 from flask_login import LoginManager, UserMixin, login_user, login_required
 from flask_sqlalchemy import SQLAlchemy
+from models import User
 
 
 member = Blueprint("member", __name__, template_folder="member")
