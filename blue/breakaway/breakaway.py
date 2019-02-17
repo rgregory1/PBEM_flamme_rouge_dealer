@@ -8,8 +8,7 @@ from flask import (
     request,
     flash,
 )
-import random
-import json
+
 import pathlib
 from functions import *
 
