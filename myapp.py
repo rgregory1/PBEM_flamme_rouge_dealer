@@ -1,66 +1,19 @@
 from flask import (
-    Flask,
-    session,
     render_template,
     url_for,
     redirect,
-    request,
-    flash,
-    Blueprint,
 )
-import random
-import json
-import pathlib
 from functions import *
 from blue.breakaway.breakaway import breakaway
 from blue.member.member import member
-import pprint
-import os
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required
+
+# we need the Flask app instance, so we get it from config
+from config import app
 
 
-app = Flask(__name__)
-
+# register the blueprints using the app instance created in the config module
 app.register_blueprint(breakaway, url_prefix="/breakaway")
 app.register_blueprint(member, url_prefix="/member")
-
-# set a 'SECRET_KEY' to enable the Flask session cookies
-app.config["SECRET_KEY"] = "not_very_secret"
-
-basedir = pathlib.Path(__file__).parent.resolve()
-basedir_os = os.path.abspath(os.path.dirname(__file__))
-
-login_manager = LoginManager(app)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-    # return User.get(user_id)
-
-
-# Build the Sqlite ULR for SqlAlchemy
-sqlite_url = "sqlite:////" + os.path.join(basedir_os, "flamme_rouge.db")
-
-# Configure the SqlAlchemy part of the app instance
-app.config["SQLALCHEMY_ECHO"] = True
-app.config["SQLALCHEMY_DATABASE_URI"] = sqlite_url
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# Create the SqlAlchemy db instance
-db = SQLAlchemy(app)
-
-
-from flask_debugtoolbar import DebugToolbarExtension
-
-# the toolbar is only enabled in debug mode:
-app.debug = True
-toolbar = DebugToolbarExtension(app)
-# DEBUG_TB_INTERCEPT_REDIRECTS = False
-app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
-# Set the secret key to the debugtoolbar
-app.secret_key = "my_secret"
 
 
 @app.route("/")
