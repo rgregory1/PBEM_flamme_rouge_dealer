@@ -1,6 +1,9 @@
-from datetime import datetime
-from myapp import db
-from flask_login import LoginManager, UserMixin, login_user, login_required
+
+# all we need from config is db, so grab it here
+from config import db
+
+# all we need from flask_login is UserMixin, so grab it here
+from flask_login import UserMixin
 
 
 class User(UserMixin, db.Model):
