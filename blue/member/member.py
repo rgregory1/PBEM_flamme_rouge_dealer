@@ -13,7 +13,15 @@ import pathlib
 from functions import *
 from flask_login import LoginManager, UserMixin, login_user, login_required
 from flask_sqlalchemy import SQLAlchemy
-from models import User
+
+
+# from models import User
+class User(UserMixin, db.Model):
+    __tablename__ = "User"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(30), unique=True)
+    password = db.Column(db.String(30))
+    account_type = db.Column(db.String(20))
 
 
 member = Blueprint("member", __name__, template_folder="member")
