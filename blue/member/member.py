@@ -2,10 +2,12 @@ from flask import (
     Blueprint,
 )
 
+
 from flask_login import login_user, login_required
 
 # we need user from models, so we grab it here
 from models import User
+
 
 # all we need is login_manager, so grab it from comnfig here
 from config import login_manager
