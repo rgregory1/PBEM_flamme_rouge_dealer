@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1>Admin Page</h1>
+
+<p><strong>Name: </strong> {{ current_user.username }}</p>
+<p><strong>Email: </strong> {{ current_user.email }}</p>
+<p><strong>Member type: </strong> {{ current_user.account_type }}</p>
+
+<h2>Users</h2>
+{% for user in users %}
+    <div id="userSection{{ user.id }}" class="card mb-2">
+
+        <div class="card-body">
+         <div class="form-inline float-left mt-1">
+             <span class="user-number">&#x23;{{ user.id }}</span>
+        </div>
+          <div class="form-inline ml-5">
+            <div class="form-group">
+                <label class="sr-only" for="inlineFormInputUserName{{ user.id }}">UserName</label>
+              <input type="text" name="username" class="form-control mr-sm-2" id="nameInput{{ user.id }}" value="{{ user.username }}">
+            </div>
+
+            <div class="form-group">
+              <label class="sr-only" for="passwordInput{{ user.id }}">Password</label>
+              <input type="password" class="form-control mr-sm-2" id="passwordInput{{ user.id }}" value="Password">
+            </div>
+
+            <div class="form-group">
+              <label class="sr-only" for="emailInput{{ user.id }}">Email</label>
+              <input type="email" class="form-control mr-sm-2" id="emailInput{{ user.id }}" value="{{ user.email }}">
+            </div>
+
+            <button class="btn btn-primary updateButton" user_id="{{ user.id }}">Update</button>
+          </div>
+        </div>
+      </div>
+
+{% endfor %}
+
+
+{% endblock %}

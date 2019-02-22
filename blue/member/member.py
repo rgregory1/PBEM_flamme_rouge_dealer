@@ -1,9 +1,7 @@
-from flask import (
-    Blueprint,
-)
+from flask import Blueprint, render_template, request, redirect, url_for, session
 
+from flask_login import login_user, login_required, current_user, logout_user
 
-from flask_login import login_user, login_required
 
 # we need user from models, so we grab it here
 from models import User
@@ -22,32 +20,36 @@ def load_user(user_id):
     return User.query.filter(User.id == int(user_id)).first()
 
 
-@member.route("/login")
+@member.route("/login", methods=["GET", "POST"])
 def member_login():
-    user = User.query.filter_by(username="rusti").first()
-    login_user(user)
-    return """
-    <html>
-    <head>
-        <title>Logged in page</title>
-    </head>
-    <body>
-        <h1>you are logged in</h1>
-    </body>
-    </html>
-    """
+    if request.method == "POST":
+        username = request.form["username"]
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            return "user does not exixt"
+
+        login_user(user, remember=True)
+
+        if "next" in session:
+            next = session["next"]
+
+            if next is not None:
+                return redirect(next)
+
+        return redirect(url_for("member.member_page"))
+    session["next"] = request.args.get("next")
+    return render_template("member/login.html")
 
 
 @member.route("/member_page")
 @login_required
 def member_page():
-    return """
-    <html>
-    <head>
-        <title>Member Page</title>
-    </head>
-    <body>
-        <h1>you are in a protected page</h1>
-    </body>
-    </html>
-    """
+    return render_template("member/member_page.html")
+
+
+@member.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("home"))

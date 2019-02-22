@@ -33,6 +33,9 @@ toolbar = DebugToolbarExtension(app)
 
 # create the login manager instance we'll use everyhere
 login_manager = LoginManager(app)
+# redirect to login page if trying to get to protected Page
+login_manager.login_view = "member.member_login"
+
 
 # set a 'SECRET_KEY' to enable the Flask session cookies
 app.config["SECRET_KEY"] = "not_very_secret"
@@ -46,8 +49,7 @@ sqlite_url = "sqlite:////" + os.path.join(basedir_os, "flamme_rouge.db")
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = sqlite_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["USE_SESSION_FOR_NEXT"] = True
 
 # Create the SqlAlchemy db instance we'll use everywhere
 db = SQLAlchemy(app)
-
-
