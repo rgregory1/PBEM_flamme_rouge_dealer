@@ -65,8 +65,6 @@ def choose_deck():
         session["deck_1"]["hand_size"] = 4
         session["deck_2"]["hand_size"] = 4
     session.modified = True
-    # freeze the state to come back to the beginning of the round
-    # freeze_state = dict(session)
     return render_template("choose_deck.html")
 
 
@@ -154,6 +152,8 @@ def hidden_cards():
     session["current_deck"] = []
 
     session.modified = True
+    if session.get("PBEM"):
+        return redirect(url_for("member.save_turn"))
     return render_template("hidden_cards.html")
 
 

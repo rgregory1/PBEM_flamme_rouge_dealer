@@ -9,4 +9,31 @@
 
 
 <a href="{{ url_for("admin.admin_home")}}">Admin page</a>
+
+<table class="table">
+    <tr>
+        <th>
+            Game ID
+        </th>
+        <th>
+            Round
+        </th>
+        <th>
+            Play Next Round
+        </th>
+    </tr>
+    <tr>
+        <td>
+            {{ current_turn_info.game_id }}
+        </td>
+        <td>
+            {{ current_turn_info.current_round }}
+        </td>
+        <td>
+            <a href="/member/play_next_turn/{{ current_turn_info.id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
+        </td>
+    </tr>
+</table>
+
+
 {% endblock %}
