@@ -7,13 +7,20 @@
 <p><strong>Email: </strong> {{ current_user.email }}</p>
 <p><strong>Member type: </strong> {{ current_user.account_type }}</p>
 
-
-<a href="{{ url_for("admin.admin_home")}}">Admin page</a>
+{% if current_user.account_type == 'admin' %}
+    <p><a href="{{ url_for("admin.admin_home")}}" class="btn btn-primary" role="button">Admin page</a></p>
+{% endif %}
+{% if current_user.account_type == 'admin' or current_user.account_type == 'organizer' %}
+    <p><a href="{{ url_for("member.create_game_form")}}" class="btn btn-primary" role="button">Create Game</a></p>
+{% endif %}
 
 <table class="table">
     <tr>
         <th>
             Game ID
+        </th>
+        <th>
+            Game Name
         </th>
         <th>
             Round
@@ -25,6 +32,9 @@
     <tr>
         <td>
             {{ current_turn_info.game_id }}
+        </td>
+        <td>
+            {{ current_turn_info.name }}
         </td>
         <td>
             {{ current_turn_info.current_round }}

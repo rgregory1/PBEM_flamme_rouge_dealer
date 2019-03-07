@@ -1,6 +1,6 @@
 import os
 from config import db
-from models import User
+from models import User, TurnInfo, Game
 
 # Data to initialize database with
 USERS = [
@@ -24,6 +24,17 @@ USERS = [
     },
 ]
 
+GAMES = [
+    {
+        "id": 101,
+        "creator": 3,
+        "participants": "'[3,1]'",
+        "active": True,
+        "limit": 3,
+        "name": "Test Game",
+    }
+]
+
 # Delete database file if it exists currently
 if os.path.exists("flamme_rouge.db"):
     os.remove("flamme_rouge.db")
@@ -40,5 +51,16 @@ for person in USERS:
         account_type=person.get("account_type"),
     )
     db.session.add(p)
+
+for game in GAMES:
+    this_game = Game(
+        id=game.get("id"),
+        creator=game.get("creator"),
+        participants=game.get("participants"),
+        name=game.get("name"),
+        active=game.get("active"),
+        limit=game.get("limit"),
+    )
+    db.session.add(this_game)
 
 db.session.commit()

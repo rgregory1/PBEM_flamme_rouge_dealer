@@ -21,3 +21,13 @@ class TurnInfo(UserMixin, db.Model):
     game_id = db.Column(db.Integer)
     current_round = db.Column(db.Integer)
     turn_data = db.Column(db.Text)
+
+
+class Game(UserMixin, db.Model):
+    __tablename__ = "Game"
+    id = db.Column(db.Integer, primary_key=True)
+    creator = db.Column(db.Integer, db.ForeignKey("User.id"), nullable=False)
+    participants = db.Column(db.Text)
+    name = db.Column(db.String(30))
+    active = db.Column(db.Boolean)
+    limit = db.Column(db.Integer)

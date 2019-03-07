@@ -4,7 +4,7 @@ from flask_login import login_user, login_required, current_user, logout_user
 
 
 # we need user from models, so we grab it here
-from models import User, TurnInfo
+from models import User, TurnInfo, Game
 
 
 # all we need is login_manager, so grab it from comnfig here
@@ -90,3 +90,23 @@ def play_next_round(turn_id):
     for key in this_turn_data:
         session[key] = this_turn_data[key]
     return render_template("hidden_cards.html")
+
+
+@member.route("/create_game_form")
+@login_required
+def create_game_form():
+
+    return render_template("member/create_game_form.html")
+
+
+@member.route("/create_game", methods=["POST", "GET"])
+@login_required
+def create_game():
+    race_name = request.form["race_name"]
+    race_limit = request.form["race_limit"]
+    new_race = Game(
+        creator=current_user.id, name=race_name, active=True, limit=race_limit
+    )
+    db.session.add(new_race)
+    db.session.commit()
+    return redirect(url_for("member.member_page"))

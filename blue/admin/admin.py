@@ -9,7 +9,7 @@ from models import User
 
 
 # all we need is login_manager, so grab it from comnfig here
-from config import login_manager
+from config import login_manager, db
 
 
 admin = Blueprint("admin", __name__, template_folder="admin")
@@ -39,3 +39,29 @@ def admin_home():
     users = User.query.all()
 
     return render_template("admin/admin.html", users=users)
+
+
+@admin.route("/create_user", methods=["POST", "GET"])
+@login_required
+@admin_login_required
+def create_user():
+    username = request.form["username"]
+    password = request.form["password"]
+    email = request.form["email"]
+    account_type = request.form["account_type"]
+    new_user = User(
+        username=username, password=password, email=email, account_type=account_type
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    users = User.query.all()
+
+    return redirect(url_for("admin.admin_home"))
+
+
+@admin.route("/create_user_form")
+@login_required
+@admin_login_required
+def create_user_form():
+
+    return render_template("admin/create_user_form.html")
