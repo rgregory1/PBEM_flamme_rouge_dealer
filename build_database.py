@@ -1,6 +1,6 @@
 import os
 from config import db
-from models import User, TurnInfo, Game
+from models import User, TurnInfo, Game, game_to_user
 
 # Data to initialize database with
 USERS = [
@@ -52,6 +52,9 @@ for person in USERS:
     )
     db.session.add(p)
 
+user = User.query.filter(User.id == 1).one_or_none()
+
+
 for game in GAMES:
     this_game = Game(
         id=game.get("id"),
@@ -60,6 +63,7 @@ for game in GAMES:
         name=game.get("name"),
         active=game.get("active"),
         limit=game.get("limit"),
+        user=user,
     )
     db.session.add(this_game)
 
