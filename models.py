@@ -9,8 +9,6 @@ from flask_login import UserMixin
 # Base = delcarative_base()
 
 game_to_user = db.Table(
-    # "association",
-    # Base.metadata,
     "game_to_user",
     db.Column("game_id", db.Integer, db.ForeignKey("Game.id"), primary_key=True),
     db.Column("user_id", db.Integer, db.ForeignKey("User.id"), primary_key=True),
