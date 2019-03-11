@@ -9,8 +9,6 @@ from flask_login import UserMixin
 # Base = delcarative_base()
 
 game_to_user = db.Table(
-    # "association",
-    # Base.metadata,
     "game_to_user",
     db.Column("game_id", db.Integer, db.ForeignKey("Game.id"), primary_key=True),
     db.Column("user_id", db.Integer, db.ForeignKey("User.id"), primary_key=True),
@@ -24,7 +22,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(30))
     email = db.Column(db.String(30))
     account_type = db.Column(db.String(20))
-    games = db.relationship("Game", secondary=game_to_user, back_populates="users")
+    games = db.relationship("Game", secondary=game_to_user)
 
 
 class TurnInfo(UserMixin, db.Model):
@@ -44,10 +42,4 @@ class Game(UserMixin, db.Model):
     name = db.Column(db.String(30))
     active = db.Column(db.Boolean)
     limit = db.Column(db.Integer)
-    users = db.relationship("User", secondary=game_to_user, back_populates="games")
-
-
-# class GameToUser(UserMixin, db.Model):
-#     __tablename__ = "GameToUser"
-#     game_id = db.Column(db.Integer, db.ForeignKey("Game.id"))
-#     user_id = db.Column(db.Integer, db.ForeignKey("User.id"))
+    users = db.relationship("User", secondary=game_to_user)
