@@ -9,30 +9,46 @@ USERS = [
         "password": "password",
         "email": "notsure@gmail.com",
         "account_type": "organizer",
+        "games": [
+            "Test Game One",
+        ]
     },
     {
         "username": "Brockman",
         "password": "password",
         "email": "rgregory@fnwsu.org",
         "account_type": "member",
+        "games": [
+            "Test Game One",
+            "Test Game Two"
+        ]
     },
     {
         "username": "rusti",
         "password": "password",
         "email": "mrgregory1@gmail.com",
         "account_type": "admin",
+        "games": [
+            "Test Game Two"
+        ]
     },
 ]
 
 GAMES = [
     {
-        "id": 101,
         "creator": 3,
         "participants": "'[3,1]'",
         "active": True,
         "limit": 3,
-        "name": "Test Game",
-    }
+        "name": "Test Game One",
+    },
+    {
+        "creator": 2,
+        "participants": "'[3,1]'",
+        "active": True,
+        "limit": 5,
+        "name": "Test Game Two",
+    },
 ]
 
 # Delete database file if it exists currently
@@ -51,20 +67,47 @@ for person in USERS:
         account_type=person.get("account_type"),
     )
     db.session.add(p)
-
-user = User.query.filter(User.id == 1).one_or_none()
+db.session.commit()
 
 
 for game in GAMES:
     this_game = Game(
-        id=game.get("id"),
         creator=game.get("creator"),
         participants=game.get("participants"),
         name=game.get("name"),
         active=game.get("active"),
         limit=game.get("limit"),
-        user=user,
     )
+
+    # This is sort of artificial, I added what games the users are part of
+    # in the dictionary for USERS above as a list of games. I'm using
+    # that list to add those users to the appropriate games here
+    # I'm just doing this for an experiment to populate the database.
+    # In the real application users would add themselves to games using
+    # your application.
+    # So you'll want to delete this section when you get the "add user to game"
+    # part of your application done
+
+    # iterate over the list of users
+    for user in USERS:
+
+        # iterate over the list of games the user is in
+        for game in user.get("games"):
+
+            # does the name of the game the user is in match our current db game?
+            if game == this_game.name:
+
+                # retrieve the user from the database
+                this_user = User.query \
+                    .filter(User.username == user.get("username")) \
+                    .one_or_none()
+
+                # did we get a user?
+                if this_user is not None:
+
+                    # add the user to the game
+                    this_game.users.append(this_user)
+
     db.session.add(this_game)
 
 db.session.commit()

@@ -3,6 +3,7 @@ from functions import *
 from blue.breakaway.breakaway import breakaway
 from blue.member.member import member
 from blue.admin.admin import admin
+from blue.api.rest import api
 
 # we need the Flask app instance, so we get it from config
 from config import app
@@ -12,6 +13,7 @@ from config import app
 app.register_blueprint(breakaway, url_prefix="/breakaway")
 app.register_blueprint(member, url_prefix="/member")
 app.register_blueprint(admin, url_prefix="/admin")
+app.register_blueprint(api, url_prefix="/api")
 
 
 @app.route("/")
