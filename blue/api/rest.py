@@ -3,10 +3,11 @@
 from flask import (
     Blueprint,
     jsonify,
+    request,
     make_response
 )
-from config import db
 from models import Game
+import controller
 
 
 api = Blueprint("api", __name__)
@@ -20,9 +21,14 @@ def get_games():
 
     :return:        JSON string containing list of games
     """
-    _games = Game.query \
-        .filter(Game.active == True) \
-        .all()
+    user_id = None
+
+    # is 'user_id' in the query string?
+    if "user_id" in request.args:
+        user_id = int(request.args.get("user_id", None))
+
+    # call the controller to get the games that match our requirements
+    _games = controller.get_games(user_id=user_id)
 
     # convert the list of games objects to a list of dictionaries
     # so they can be serialized

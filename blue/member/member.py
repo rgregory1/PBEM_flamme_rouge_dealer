@@ -54,10 +54,16 @@ def member_page():
         .first()
     )
 
-    my_games = controller.get_user_games()
+    # changed this to use the version that passes a user id
+    my_games = controller.get_games(current_user.id)
+
+    # print the list of games to stdout
     print(my_games)
+
     return render_template(
-        "member/member_page.html", current_turn_info=current_turn_info
+        "member/member_page.html",
+        current_turn_info=current_turn_info,
+        my_games=my_games
     )
 
 

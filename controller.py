@@ -1,75 +1,24 @@
-from config import db
-from models import Game
+from models import Game, User
 
-def get_games():
+def get_games(user_id=None):
     """
-    This function provides the /games API REST URL endpoint
-    It returns a JSON string of the list of active games
+    This function returns the list of game objects (SqlAlchemy objects)
+    from the database
 
+    :user_id:       filter the list of games based on user_id, if present
     :return:        JSON string containing list of games
     """
-    _games = Game.query \
-        .filter(Game.active == True) \
-        .all()
+    # start building the query to get all active games
+    query = Game.query \
+        .filter(Game.active)
 
-    # convert the list of games objects to a list of dictionaries
-    # so they can be serialized
-    games = [
-        {
-            "id": game.id,
-            "creator": game.creator,
-            "participants": game.participants,
-            "name": game.name,
-            "active": game.active,
-            "limit": game.limit,
-            "users": [
-                {
-                    "id": user.id,
-                    "username": user.username,
-                    "password": user.password,
-                    "email": user.email,
-                    "account_type": user.account_type,
-                }
-                for user in game.users
-            ]
-        }
-        for game in _games
-    ]
-    # response = make_response(jsonify(games), 200)
-    # response.headers["Content-Type"] = "application/json"
-    # return response
-    return games
+    # should we also filter based on the user_id?
+    if user_id is not None:
+        query = query \
+            .filter(Game.users.any(User.id == user_id))
 
-def get_user_games():
-    """
-    This function provides the /games API REST URL endpoint
-    It returns a JSON string of the list of active games
+    # get all the games that match our requirements
+    games = query.all()
 
-    :return:        JSON string containing list of games
-    """
-    _games = Game.query.filter(Game.active == True, Game.users.user.id == current_user.id).all()
-
-    # convert the list of games objects to a list of dictionaries
-    # so they can be serialized
-    games = [
-        {
-            "id": game.id,
-            "creator": game.creator,
-            "participants": game.participants,
-            "name": game.name,
-            "active": game.active,
-            "limit": game.limit,
-            "users": [
-                {
-                    "id": user.id,
-                    "username": user.username,
-                    "password": user.password,
-                    "email": user.email,
-                    "account_type": user.account_type,
-                }
-                for user in game.users
-            ]
-        }
-        for game in _games
-    ]
+    # return the list of SqlAlchemy game objects
     return games
