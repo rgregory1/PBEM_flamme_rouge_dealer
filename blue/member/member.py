@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_user, login_required, current_user, logout_user
 import controller
-
+from pprint import pprint
 
 # we need user from models, so we grab it here
 from models import User, TurnInfo, Game
@@ -53,9 +53,9 @@ def member_page():
         .order_by(TurnInfo.id.desc())
         .first()
     )
-
-    my_games = controller.get_user_games()
-    print(my_games)
+    this_id = current_user.id
+    my_games = controller.get_user_games(this_id)
+    pprint(my_games)
     return render_template(
         "member/member_page.html", current_turn_info=current_turn_info
     )
