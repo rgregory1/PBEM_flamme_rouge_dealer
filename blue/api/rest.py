@@ -6,8 +6,8 @@ from flask import (
     request,
     make_response
 )
-from models import Game
 import controller
+from config import logger
 
 
 api = Blueprint("api", __name__)

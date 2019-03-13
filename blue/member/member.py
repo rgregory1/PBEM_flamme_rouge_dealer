@@ -3,13 +3,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from flask_login import login_user, login_required, current_user, logout_user
 import controller
 
-
 # we need user from models, so we grab it here
 from models import User, TurnInfo, Game
 
-
 # all we need is login_manager, so grab it from comnfig here
-from config import login_manager, db
+from config import login_manager, db, logger
 
 
 member = Blueprint("member", __name__, template_folder="member")
@@ -57,8 +55,9 @@ def member_page():
     # changed this to use the version that passes a user id
     my_games = controller.get_games(current_user.id)
 
-    # print the list of games to stdout
-    print(my_games)
+    # log the list of games to stdout
+    logger.debug("Here is the list of games returned for this user")
+    logger.debug(my_games)
 
     return render_template(
         "member/member_page.html",

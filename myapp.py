@@ -6,7 +6,7 @@ from blue.admin.admin import admin
 from blue.api.rest import api
 
 # we need the Flask app instance, so we get it from config
-from config import app
+from config import app, logger
 
 
 # register the blueprints using the app instance created in the config module
@@ -209,6 +209,29 @@ def change_hand_size():
     return ("", 204)
 
 
+# I've included this here just as an example of handling an exception
+# and using the debugger to log it
+@app.route("/exception", methods=["GET"])
+def raise_exception():
+    html = """
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <title>Just an exception handler</title>
+    </head>
+    <body>
+        <h1>Just an exception handler</h1>
+    </body>
+    </html>
+    """
+    try:
+        v = 10 / 0
+    except Exception as e:
+        logger.exception(str(e), exc_info=True)
+
+    return html
+
+
 # @app.route("/test_endpoint", methods=["POST", "GET"])
 # def test_endpoint():
 #
@@ -217,4 +240,6 @@ def change_hand_size():
 
 if __name__ == "__main__":
     # app.run(debug=True)
-    app.run(host="0.0.0.0")
+    host = "0.0.0.0"
+    logger.info(f"Starting Flamme Rouge server at: {host}")
+    app.run(host=host)
