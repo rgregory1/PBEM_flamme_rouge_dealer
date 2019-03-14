@@ -14,21 +14,16 @@ api = Blueprint("api", __name__)
 
 
 @api.route("/games", methods=["GET"])
-def get_games():
+@api.route("/games/<int:game_id>")
+def get_games(game_id=None):
     """
-    This function provides the /games API REST URL endpoint
+    This function provides the /games/<game_id> API REST URL endpoint
     It returns a JSON string of the list of active games
 
     :return:        JSON string containing list of games
     """
-    user_id = None
-
-    # is 'user_id' in the query string?
-    if "user_id" in request.args:
-        user_id = int(request.args.get("user_id", None))
-
     # call the controller to get the games that match our requirements
-    _games = controller.get_games(user_id=user_id)
+    _games = controller.get_games(game_id=game_id)
 
     # convert the list of games objects to a list of dictionaries
     # so they can be serialized
@@ -54,5 +49,45 @@ def get_games():
         for game in _games
     ]
     response = make_response(jsonify(games), 200)
+    response.headers["Content-Type"] = "application/json"
+    return response
+
+
+@api.route("/users", methods=["GET"])
+@api.route("/users/<int:user_id>")
+def get_users(user_id=None):
+    """
+    This function provides the /users/<user_id> API REST URL endpoint
+    It returns a JSON string of the list of users
+
+    :return:        JSON string containing list of users
+    """
+    # call the controller to get the users that match our requirements
+    _users = controller.get_users(user_id=user_id)
+
+    # convert the list of user objects to a list of dictionaries
+    # so they can be serialized
+    users = [
+        {
+            "id": user.id,
+            "username": user.username,
+            "password": user.password,
+            "email": user.email,
+            "account_type": user.account_type,
+            "games": [
+                {
+                    "id": game.id,
+                    "creator": game.creator,
+                    "participants": game.participants,
+                    "name": game.name,
+                    "active": game.active,
+                    "limit": game.limit,
+                }
+                for game in user.games
+            ]
+        }
+        for user in _users
+    ]
+    response = make_response(jsonify(users), 200)
     response.headers["Content-Type"] = "application/json"
     return response

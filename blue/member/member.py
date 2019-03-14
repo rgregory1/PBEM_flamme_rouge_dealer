@@ -53,16 +53,20 @@ def member_page():
     )
 
     # changed this to use the version that passes a user id
-    my_games = controller.get_games(current_user.id)
+    users = controller.get_users(current_user.id)
+
+    # did we get a list of users?
+    if users:
+        user = users[0]
 
     # log the list of games to stdout
-    logger.debug("Here is the list of games returned for this user")
-    logger.debug(my_games)
+    logger.debug("Here is the user list returned for this user")
+    logger.debug(user)
 
     return render_template(
         "member/member_page.html",
         current_turn_info=current_turn_info,
-        my_games=my_games
+        user=user
     )
 
 
