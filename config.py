@@ -7,6 +7,7 @@ information
 
 # system modules
 import os
+import logging
 
 # 3rd party modules
 import pathlib
@@ -53,3 +54,11 @@ app.config["USE_SESSION_FOR_NEXT"] = True
 
 # Create the SqlAlchemy db instance we'll use everywhere
 db = SQLAlchemy(app)
+
+# create a logger instance that can be used everywhere
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+logger = logging.getLogger("flamme")

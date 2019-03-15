@@ -2,14 +2,15 @@ import json
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_user, login_required, current_user, logout_user
 import controller
+
 from pprint import pprint
+
 
 # we need user from models, so we grab it here
 from models import User, TurnInfo, Game
 
-
 # all we need is login_manager, so grab it from comnfig here
-from config import login_manager, db
+from config import login_manager, db, logger
 
 
 member = Blueprint("member", __name__, template_folder="member")
@@ -53,11 +54,24 @@ def member_page():
         .order_by(TurnInfo.id.desc())
         .first()
     )
-    this_id = current_user.id
-    my_games = controller.get_user_games(this_id)
-    pprint(my_games)
+
+
+    # changed this to use the version that passes a user id
+    users = controller.get_users(current_user.id)
+
+    # did we get a list of users?
+    if users:
+        user = users[0]
+
+    # log the list of games to stdout
+    logger.debug("Here is the user list returned for this user")
+    logger.debug(user)
+
+
     return render_template(
-        "member/member_page.html", current_turn_info=current_turn_info
+        "member/member_page.html",
+        current_turn_info=current_turn_info,
+        user=user
     )
 
 

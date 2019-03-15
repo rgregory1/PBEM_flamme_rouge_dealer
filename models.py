@@ -4,6 +4,9 @@ from config import db
 # all we need from flask_login is UserMixin, so grab it here
 from flask_login import UserMixin
 
+# imported pretty print to pring objects of the classes below
+from pprint import pformat
+
 # from sqlalchemy.ext.declarative import delcarative_base
 
 # Base = delcarative_base()
@@ -24,6 +27,12 @@ class User(UserMixin, db.Model):
     account_type = db.Column(db.String(20))
     games = db.relationship("Game", secondary=game_to_user)
 
+    def __str__(self):
+        return pformat(vars(self), indent=4, width=1)
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class TurnInfo(UserMixin, db.Model):
     __tablename__ = "TurnInfo"
@@ -32,6 +41,12 @@ class TurnInfo(UserMixin, db.Model):
     game_id = db.Column(db.Integer)
     current_round = db.Column(db.Integer)
     turn_data = db.Column(db.Text)
+
+    def __str__(self):
+        return pformat(vars(self), indent=4, width=1)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Game(UserMixin, db.Model):
@@ -43,3 +58,9 @@ class Game(UserMixin, db.Model):
     active = db.Column(db.Boolean)
     limit = db.Column(db.Integer)
     users = db.relationship("User", secondary=game_to_user)
+
+    def __str__(self):
+        return pformat(vars(self), indent=4, width=1)
+
+    def __repr__(self):
+        return self.__str__()

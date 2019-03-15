@@ -29,6 +29,7 @@
             Play Next Round
         </th>
     </tr>
+    <!--
     <tr>
         <td>
             {{ current_turn_info.game_id }}
@@ -43,6 +44,19 @@
             <a href="/member/play_next_turn/{{ current_turn_info.id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
         </td>
     </tr>
+    -->
+
+    <!-- Is this more what you're looking for? -->
+    {% for game in user.games %}
+        <tr>
+            <td>{{ game.id }}</td>
+            <td>{{ game.name }}</td>
+            <td>current round</td>
+            <td>
+                <a href="/member/play_next_turn/{{ current_turn_info.id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
+            </td>
+        </tr>
+    {% endfor %}
 </table>
 
 

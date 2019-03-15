@@ -1,77 +1,46 @@
-from config import db
-from models import Game, User, game_to_user
 
-# TODO figiure out what the minimum that I need to import to use current_user
+from models import Game, User
 
-def get_games():
+
+def get_games(game_id=None):
     """
-    This function provides the /games API REST URL endpoint
-    It returns a JSON string of the list of active games
+    This function returns the list of game objects (SqlAlchemy objects)
+    from the database
 
-    :return:        JSON string containing list of games
+    :game_id:       filter the list of games based on game_id, if present
+    :return:        list of games, or single game
     """
-    _games = Game.query \
-        .filter(Game.active == True) \
-        .all()
+    # start building the query to get all active games
+    query = Game.query \
+        .filter(Game.active)
 
-    # convert the list of games objects to a list of dictionaries
-    # so they can be serialized
-    games = [
-        {
-            "id": game.id,
-            "creator": game.creator,
-            "participants": game.participants,
-            "name": game.name,
-            "active": game.active,
-            "limit": game.limit,
-            "users": [
-                {
-                    "id": user.id,
-                    "username": user.username,
-                    "password": user.password,
-                    "email": user.email,
-                    "account_type": user.account_type,
-                }
-                for user in game.users
-            ]
-        }
-        for game in _games
-    ]
-    # response = make_response(jsonify(games), 200)
-    # response.headers["Content-Type"] = "application/json"
-    # return response
+    # should we also filter based on the user_id?
+    if game_id is not None:
+        query = query \
+            .filter(Game.id == game_id)
+
+    games = query.all()
     return games
 
-def get_user_games(this_id):
-    """
-    This function provides the /games API REST URL endpoint
-    It returns a dict of the list of active games of current_user
 
-    :return:        dict containing list of games for the current user
-    """
-    _games = Game.query.filter(Game.active==True).filter(Game.users.any(User.id == this_id)).all()
 
-    # convert the list of games objects to a list of dictionaries
-    # so they can be serialized
-    games = [
-        {
-            "id": game.id,
-            "creator": game.creator,
-            "participants": game.participants,
-            "name": game.name,
-            "active": game.active,
-            "limit": game.limit,
-            "users": [
-                {
-                    "id": user.id,
-                    "username": user.username,
-                    "password": user.password,
-                    "email": user.email,
-                    "account_type": user.account_type,
-                }
-                for user in game.users
-            ]
-        }
-        for game in _games
-    ]
-    return games
+def get_users(user_id=None):
+    """
+    This function returns the list of users, if no user_id is supplied,
+    and a single user if the user_id is supplied.
+
+    :param user_id:     user id to filter on if present
+    :return:            list of users
+    """
+    # start building the query to get all users
+    query = User.query
+
+    # should we filter down to a single user?
+    if user_id is not None:
+        query = query \
+            .filter(User.id == user_id)
+
+    users = query.all()
+    return users
+
+
