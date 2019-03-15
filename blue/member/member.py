@@ -3,6 +3,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from flask_login import login_user, login_required, current_user, logout_user
 import controller
 
+from pprint import pprint
+
+
 # we need user from models, so we grab it here
 from models import User, TurnInfo, Game
 
@@ -52,6 +55,7 @@ def member_page():
         .first()
     )
 
+
     # changed this to use the version that passes a user id
     users = controller.get_users(current_user.id)
 
@@ -62,6 +66,7 @@ def member_page():
     # log the list of games to stdout
     logger.debug("Here is the user list returned for this user")
     logger.debug(user)
+
 
     return render_template(
         "member/member_page.html",

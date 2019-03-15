@@ -1,4 +1,6 @@
+
 from models import Game, User
+
 
 def get_games(game_id=None):
     """
@@ -21,6 +23,7 @@ def get_games(game_id=None):
     return games
 
 
+
 def get_users(user_id=None):
     """
     This function returns the list of users, if no user_id is supplied,
@@ -39,4 +42,5 @@ def get_users(user_id=None):
 
     users = query.all()
     return users
+
 
