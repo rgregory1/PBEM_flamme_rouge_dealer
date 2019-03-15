@@ -1,6 +1,8 @@
 from config import db
 from models import Game, User, game_to_user
 
+# TODO figiure out what the minimum that I need to import to use current_user
+
 def get_games():
     """
     This function provides the /games API REST URL endpoint
@@ -48,7 +50,7 @@ def get_user_games(this_id):
     :return:        dict containing list of games for the current user
     """
     _games = Game.query.filter(Game.active==True).filter(Game.users.any(User.id == this_id)).all()
-    
+
     # convert the list of games objects to a list of dictionaries
     # so they can be serialized
     games = [
