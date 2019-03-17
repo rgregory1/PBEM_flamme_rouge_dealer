@@ -1,11 +1,6 @@
 # This module provides the REST API (example) for the application
 
-from flask import (
-    Blueprint,
-    jsonify,
-    request,
-    make_response
-)
+from flask import Blueprint, jsonify, request, make_response
 import controller
 from config import logger
 
@@ -31,7 +26,6 @@ def get_games(game_id=None):
         {
             "id": game.id,
             "creator": game.creator,
-            "participants": game.participants,
             "name": game.name,
             "active": game.active,
             "limit": game.limit,
@@ -44,7 +38,7 @@ def get_games(game_id=None):
                     "account_type": user.account_type,
                 }
                 for user in game.users
-            ]
+            ],
         }
         for game in _games
     ]
@@ -78,13 +72,12 @@ def get_users(user_id=None):
                 {
                     "id": game.id,
                     "creator": game.creator,
-                    "participants": game.participants,
                     "name": game.name,
                     "active": game.active,
                     "limit": game.limit,
                 }
                 for game in user.games
-            ]
+            ],
         }
         for user in _users
     ]
