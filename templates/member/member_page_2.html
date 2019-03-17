@@ -32,15 +32,11 @@
 
 
     <!-- Is this more what you're looking for? -->
-    {% for game in member_games_info %}
+    {% for game in user.games %}
         <tr>
-            <td>{{ game.game_id }}</td>
+            <td>{{ game.id }}</td>
             <td>{{ game.name }}</td>
-            {% if game.current_round %}
-                <td>{{ game.current_round }}</td>
-            {% else %}
-                <td>Begin</td>
-            {% endif %}
+            <td>current round</td>
             <td>
                 <a href="/member/play_next_turn/#" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
             </td>

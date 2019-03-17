@@ -49,12 +49,6 @@ def member_login():
 def member_page():
     # only for testing purposes
     session["PBEM"] = True
-    current_turn_info = (
-        TurnInfo.query.filter_by(user_id=current_user.id)
-        .order_by(TurnInfo.id.desc())
-        .first()
-    )
-
 
     # changed this to use the version that passes a user id
     users = controller.get_users(current_user.id)
@@ -63,16 +57,72 @@ def member_page():
     if users:
         user = users[0]
 
-    # log the list of games to stdout
-    logger.debug("Here is the user list returned for this user")
-    logger.debug(user)
+    member_games_info = []
+    # Ok i got nothing else, lets put this Here
+    _users_trial = controller.get_users_dict(current_user.id)
+    users_trial = _users_trial[0]
+    # print("\nhere is the user dict\n")
+    # pprint(users_trial)
 
-
+    for game in users_trial["games"]:
+        this_game_info = {}
+        this_game_info["game_id"] = game["id"]
+        this_game_info["name"] = game["name"]
+        this_turn_data = controller.get_latest_turn(game["id"], current_user.id)
+        # print("----------------------------------")
+        # print("----------------------------------")
+        # print("this is the turn data")
+        # print("\n")
+        # print(this_turn_data)
+        if this_turn_data:
+            this_game_info["current_round"] = this_turn_data.current_round
+        else:
+            this_game_info["current_round"] = None
+        # print("----------------------------------")
+        # print("this is the game info")
+        # print("\n")
+        # pprint(this_game_info)
+        member_games_info.append(this_game_info)
+    print("----------------------------------")
+    print("----------------------------------")
+    print("this is the member games info")
+    print("\n")
+    pprint(member_games_info)
     return render_template(
-        "member/member_page.html",
-        current_turn_info=current_turn_info,
-        user=user
+        "member/member_page.html", user=user, member_games_info=member_games_info
     )
+
+
+# preserved member page so I don't blow the whole thing
+# @member.route("/member_page")
+# @login_required
+# def member_page():
+#     # only for testing purposes
+#     session["PBEM"] = True
+#     current_turn_info = (
+#         TurnInfo.query.filter_by(user_id=current_user.id)
+#         .order_by(TurnInfo.id.desc())
+#         .first()
+#     )
+#
+#
+#     # changed this to use the version that passes a user id
+#     users = controller.get_users(current_user.id)
+#
+#     # did we get a list of users?
+#     if users:
+#         user = users[0]
+#
+#     # log the list of games to stdout
+#     logger.debug("Here is the user list returned for this user")
+#     logger.debug(user)
+#
+#
+#     return render_template(
+#         "member/member_page.html",
+#         current_turn_info=current_turn_info,
+#         user=user
+#     )
 
 
 @member.route("/logout")
@@ -90,7 +140,7 @@ def save_turn():
     frozen_data = json.dumps(freeze_state)
     turn_data = TurnInfo(
         user_id=current_user.id,
-        game_id=101,
+        game_id=1,
         current_round=session["round"],
         turn_data=frozen_data,
     )
