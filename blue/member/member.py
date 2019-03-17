@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from flask_login import login_user, login_required, current_user, logout_user
 import controller
 
@@ -7,7 +7,7 @@ from pprint import pprint
 
 
 # we need user from models, so we grab it here
-from models import User, TurnInfo, Game
+from models import User, TurnInfo, Game, game_to_user
 
 # all we need is login_manager, so grab it from comnfig here
 from config import login_manager, db, logger
@@ -50,46 +50,33 @@ def member_page():
     # only for testing purposes
     session["PBEM"] = True
 
-    # changed this to use the version that passes a user id
-    users = controller.get_users(current_user.id)
-
-    # did we get a list of users?
-    if users:
-        user = users[0]
-
+    # create blank list to fill with game info
     member_games_info = []
-    # Ok i got nothing else, lets put this Here
-    _users_trial = controller.get_users_dict(current_user.id)
-    users_trial = _users_trial[0]
-    # print("\nhere is the user dict\n")
-    # pprint(users_trial)
 
-    for game in users_trial["games"]:
+    # get dict of user info including games registered for
+    _users = controller.get_users_dict(current_user.id)
+    users = _users[0]
+
+    for game in users["games"]:
+        # create empty dict for each game
         this_game_info = {}
+        # id and game name
         this_game_info["game_id"] = game["id"]
         this_game_info["name"] = game["name"]
+        # use game id to see if data for game is stored in TurnInfo table if it's there,
+        # return the last turns number
         this_turn_data = controller.get_latest_turn(game["id"], current_user.id)
-        # print("----------------------------------")
-        # print("----------------------------------")
-        # print("this is the turn data")
-        # print("\n")
-        # print(this_turn_data)
+
+        # assign
         if this_turn_data:
             this_game_info["current_round"] = this_turn_data.current_round
         else:
             this_game_info["current_round"] = None
-        # print("----------------------------------")
-        # print("this is the game info")
-        # print("\n")
-        # pprint(this_game_info)
+
         member_games_info.append(this_game_info)
-    print("----------------------------------")
-    print("----------------------------------")
-    print("this is the member games info")
-    print("\n")
-    pprint(member_games_info)
+
     return render_template(
-        "member/member_page.html", user=user, member_games_info=member_games_info
+        "member/member_page.html", member_games_info=member_games_info
     )
 
 
@@ -138,11 +125,13 @@ def save_turn():
     # freeze the state to come back to the beginning of the round
     freeze_state = dict(session)
     frozen_data = json.dumps(freeze_state)
+    chosen_cards = json.dumps(session["chosen_cards"])
     turn_data = TurnInfo(
         user_id=current_user.id,
         game_id=1,
         current_round=session["round"],
         turn_data=frozen_data,
+        chosen_cards=chosen_cards,
     )
     db.session.add(turn_data)
     db.session.commit()
@@ -177,4 +166,34 @@ def create_game():
     )
     db.session.add(new_race)
     db.session.commit()
+    return redirect(url_for("member.member_page"))
+
+
+@member.route("/join_game", methods=["POST", "Get"])
+@login_required
+def join_game():
+    game_number = request.form["join_game"]
+
+    # test if string is not empty and contains numbers
+    if game_number is not "" and game_number.isdigit():
+        # test if game is in database
+        game_on = (
+            db.session.query(Game.id).filter_by(id=game_number).scalar() is not None
+        )
+        if game_on:
+            # if game is in database, add user to game
+            try:
+                joiner = game_to_user.insert().values(
+                    game_id=game_number, user_id=current_user.id
+                )
+                # joiner = game_to_user(game_id=game_number, user_id=current_user.id)
+                db.session.execute(joiner)
+                db.session.commit()
+            except:
+                flash("Already registered")
+            return redirect(url_for("member.member_page"))
+        else:
+            flash("No such game")
+    else:
+        flash("Invalid Entry")
     return redirect(url_for("member.member_page"))

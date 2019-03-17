@@ -55,7 +55,6 @@ def get_users_dict(user_id=None):
                 {
                     "id": game.id,
                     "creator": game.creator,
-                    "participants": game.participants,
                     "name": game.name,
                     "active": game.active,
                     "limit": game.limit,

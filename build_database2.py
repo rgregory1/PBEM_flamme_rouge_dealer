@@ -9,27 +9,46 @@ USERS = [
         "password": "password",
         "email": "notsure@gmail.com",
         "account_type": "organizer",
-        "games": ["Test Game One"],
+        "games": [
+            "Test Game One",
+        ]
     },
     {
         "username": "Brockman",
         "password": "password",
         "email": "rgregory@fnwsu.org",
         "account_type": "member",
-        "games": ["Test Game One", "Test Game Two"],
+        "games": [
+            "Test Game One",
+            "Test Game Two"
+        ]
     },
     {
         "username": "rusti",
         "password": "password",
         "email": "mrgregory1@gmail.com",
         "account_type": "admin",
-        "games": ["Test Game Two"],
+        "games": [
+            "Test Game Two"
+        ]
     },
 ]
 
 GAMES = [
-    {"creator": 3, "active": True, "limit": 3, "name": "Test Game One"},
-    {"creator": 2, "active": True, "limit": 5, "name": "Test Game Two"},
+    {
+        "creator": 3,
+        "participants": "'[3,1]'",
+        "active": True,
+        "limit": 3,
+        "name": "Test Game One",
+    },
+    {
+        "creator": 2,
+        "participants": "'[3,1]'",
+        "active": True,
+        "limit": 5,
+        "name": "Test Game Two",
+    },
 ]
 
 # Delete database file if it exists currently
@@ -54,6 +73,7 @@ db.session.commit()
 for game in GAMES:
     this_game = Game(
         creator=game.get("creator"),
+        participants=game.get("participants"),
         name=game.get("name"),
         active=game.get("active"),
         limit=game.get("limit"),
@@ -78,9 +98,9 @@ for game in GAMES:
             if game == this_game.name:
 
                 # retrieve the user from the database
-                this_user = User.query.filter(
-                    User.username == user.get("username")
-                ).one_or_none()
+                this_user = User.query \
+                    .filter(User.username == user.get("username")) \
+                    .one_or_none()
 
                 # did we get a user?
                 if this_user is not None:

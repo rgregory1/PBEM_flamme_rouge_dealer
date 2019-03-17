@@ -14,7 +14,7 @@
     <p><a href="{{ url_for("member.create_game_form")}}" class="btn btn-primary" role="button">Create Game</a></p>
 {% endif %}
 
-<table class="table">
+<table class="table table-striped table-dark">
     <tr>
         <th>
             Game ID
@@ -48,5 +48,18 @@
     {% endfor %}
 </table>
 
-
+<div class="row">
+    <div class="col-6">
+        <div class="card text-white bg-secondary p-3" style="max-width: 18rem;">
+    <!-- <div class="col-4 col-sm-2"> -->
+            <form action="{{ url_for("member.join_game")}}" method="POST">
+                <div class="form-group">
+                    <label class="mr-2" for="join_game">Join Game:</label>
+                    <input type="join_game" name="join_game" class="form-control mr-2" id="join_game" aria-describedby="join_game">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
