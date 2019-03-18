@@ -1,4 +1,5 @@
 from models import Game, User, TurnInfo
+from sqlalchemy import desc
 
 
 def get_games(game_id=None):
@@ -37,6 +38,37 @@ def get_users(user_id=None):
 
     users = query.all()
     return users
+
+
+def get_turns(user_id=None, game_id=None):
+    """
+    This function returns the list of turns that match
+    the user and game id.
+
+    :param user_id:     user id to filter on if present
+    :param game_id:     game id to filter on if present
+    :return:            list of turns
+
+    ** NOTE ** I added this because I couldn't think of some
+    cool way to relate turn_info to both users and games. So
+    I set this up as a separate query to get the turns
+    that match the user AND the game. I did the order_by
+    to make sure if any turns are found, the turn at
+    index 0 would be the current (latest) round.
+    """
+    # start building the query to get all the turns
+    query = TurnInfo.query
+
+    # should we filter by user and game?
+    if user_id is not None and game_id is not None:
+        query = query \
+            .filter(TurnInfo.user_id == user_id) \
+            .filter(TurnInfo.game_id == game_id) \
+            .order_by(TurnInfo.current_round.desc())
+
+    # run the query
+    turns = query.all()
+    return turns
 
 
 def get_users_dict(user_id=None):

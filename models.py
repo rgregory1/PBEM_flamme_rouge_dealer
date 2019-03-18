@@ -1,15 +1,15 @@
+
+import json
+
 # all we need from config is db, so grab it here
 from config import db
 
 # all we need from flask_login is UserMixin, so grab it here
 from flask_login import UserMixin
 
-# imported pretty print to pring objects of the classes below
+# imported pretty print to print objects of the classes below
 from pprint import pformat
 
-# from sqlalchemy.ext.declarative import delcarative_base
-
-# Base = delcarative_base()
 
 game_to_user = db.Table(
     "game_to_user",
@@ -28,7 +28,7 @@ class User(UserMixin, db.Model):
     games = db.relationship("Game", secondary=game_to_user)
 
     def __str__(self):
-        return pformat(vars(self), indent=4, width=1)
+        return pformat(vars(self), indent=4, width=80)
 
     def __repr__(self):
         return self.__str__()
@@ -37,12 +37,25 @@ class User(UserMixin, db.Model):
 class TurnInfo(UserMixin, db.Model):
     __tablename__ = "TurnInfo"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("User.id"), nullable=False)
+    user_id = db.Column(db.Integer)
     game_id = db.Column(db.Integer)
     current_round = db.Column(db.Integer)
     turn_data = db.Column(db.Text)
     summary_data = db.Column(db.Text)
     total_exhaustion = db.Column(db.Integer)
+
+    # I added these properties to the class that
+    # automatically convert the JSON string to a dictionary
+    # when you access the property. So for example you would get a
+    # turn_info instance and you could do this:
+    # turn_info.turn_data_json["<some key in the data">]
+    @property
+    def turn_data_json(self):
+        return json.loads(self.turn_data)
+
+    @property
+    def summary_data_json(self):
+        return json.loads(self.summary_data)
 
     def __str__(self):
         return pformat(vars(self), indent=4, width=1)
@@ -60,6 +73,10 @@ class Game(UserMixin, db.Model):
     limit = db.Column(db.Integer)
     users = db.relationship("User", secondary=game_to_user)
     options = db.Column(db.Text)
+
+    @property
+    def options_json(self):
+        return json.loads(self.options)
 
     def __str__(self):
         return pformat(vars(self), indent=4, width=1)
