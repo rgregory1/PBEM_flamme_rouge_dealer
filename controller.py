@@ -58,6 +58,7 @@ def get_users_dict(user_id=None):
                     "name": game.name,
                     "active": game.active,
                     "limit": game.limit,
+                    "options": game.options,
                 }
                 for game in user.games
             ],

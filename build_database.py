@@ -1,6 +1,7 @@
 import os
 from config import db
 from models import User, TurnInfo, Game, game_to_user
+import json
 
 # Data to initialize database with
 USERS = [
@@ -36,6 +37,10 @@ GAMES = [
 if os.path.exists("flamme_rouge.db"):
     os.remove("flamme_rouge.db")
 
+# String-ify a dictionary to save in options
+pre_options = {"is_meteo": True, "breakaway_option": True}
+options = json.dumps(pre_options)
+
 # Create the database
 db.create_all()
 
@@ -57,6 +62,7 @@ for game in GAMES:
         name=game.get("name"),
         active=game.get("active"),
         limit=game.get("limit"),
+        options=options,
     )
 
     # This is sort of artificial, I added what games the users are part of

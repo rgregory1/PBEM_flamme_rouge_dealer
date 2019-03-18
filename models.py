@@ -41,7 +41,8 @@ class TurnInfo(UserMixin, db.Model):
     game_id = db.Column(db.Integer)
     current_round = db.Column(db.Integer)
     turn_data = db.Column(db.Text)
-    chosen_cards = db.Column(db.Text)
+    summary_data = db.Column(db.Text)
+    total_exhaustion = db.Column(db.Integer)
 
     def __str__(self):
         return pformat(vars(self), indent=4, width=1)
@@ -58,6 +59,7 @@ class Game(UserMixin, db.Model):
     active = db.Column(db.Boolean)
     limit = db.Column(db.Integer)
     users = db.relationship("User", secondary=game_to_user)
+    options = db.Column(db.Text)
 
     def __str__(self):
         return pformat(vars(self), indent=4, width=1)

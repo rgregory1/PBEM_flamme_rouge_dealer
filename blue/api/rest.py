@@ -29,6 +29,7 @@ def get_games(game_id=None):
             "name": game.name,
             "active": game.active,
             "limit": game.limit,
+            "options": game.options,
             "users": [
                 {
                     "id": user.id,
@@ -75,6 +76,7 @@ def get_users(user_id=None):
                     "name": game.name,
                     "active": game.active,
                     "limit": game.limit,
+                    "options": game.options,
                 }
                 for game in user.games
             ],

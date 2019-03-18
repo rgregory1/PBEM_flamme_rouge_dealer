@@ -48,8 +48,9 @@ def member_login():
 @login_required
 def member_page():
     # only for testing purposes
-    session["PBEM"] = True
-
+    # session["PBEM"] = True
+    if session.get("round"):
+        session.pop("round")
     # create blank list to fill with game info
     member_games_info = []
 
@@ -70,6 +71,7 @@ def member_page():
         # assign
         if this_turn_data:
             this_game_info["current_round"] = this_turn_data.current_round
+            this_game_info["turn_id"] = this_turn_data.id
         else:
             this_game_info["current_round"] = None
 
@@ -125,13 +127,13 @@ def save_turn():
     # freeze the state to come back to the beginning of the round
     freeze_state = dict(session)
     frozen_data = json.dumps(freeze_state)
-    chosen_cards = json.dumps(session["chosen_cards"])
+    summary_data = json.dumps(session["chosen_cards"])
     turn_data = TurnInfo(
         user_id=current_user.id,
-        game_id=1,
+        game_id=session["game_id"],
         current_round=session["round"],
         turn_data=frozen_data,
-        chosen_cards=chosen_cards,
+        summary_data=summary_data,
     )
     db.session.add(turn_data)
     db.session.commit()
@@ -159,10 +161,23 @@ def create_game_form():
 @member.route("/create_game", methods=["POST", "GET"])
 @login_required
 def create_game():
+    options = {"is_meteo": False, "breakaway_option": False}
+    if "is_meteo" in request.form:
+        options["is_meteo"] = True
+
+    # begin dealing with breakaway options
+    if "breakaway_option" in request.form:
+        # setup the breakaway variables
+        options["breakaway_option"] = True
+    frozen_options = json.dumps(options)
     race_name = request.form["race_name"]
     race_limit = request.form["race_limit"]
     new_race = Game(
-        creator=current_user.id, name=race_name, active=True, limit=race_limit
+        creator=current_user.id,
+        name=race_name,
+        active=True,
+        limit=race_limit,
+        options=frozen_options,
     )
     db.session.add(new_race)
     db.session.commit()
@@ -197,3 +212,45 @@ def join_game():
     else:
         flash("Invalid Entry")
     return redirect(url_for("member.member_page"))
+
+
+@member.route("/initial_PBEM_turn/<game_id>", methods=["POST", "GET"])
+@login_required
+def initial_PBEM_turn(game_id):
+    session.clear()
+    session["game_id"] = game_id
+    session["PBEM"] = True
+    game_data = Game.query.filter_by(id=game_id).first()
+    # print("\n---------------------\n")
+    # print(frozen_options)
+    options = json.loads(game_data.options)
+    session["is_meteo"] = options["is_meteo"]
+    session["breakaway_option"] = options["breakaway_option"]
+    return render_template("member/PBEM_home.html")
+
+
+# @member.route("/setup", methods=["POST", "GET"])
+# @login_required
+# def setup():
+#     # collect form info
+#     team_color = request.form["team_color"]
+#
+#     initialize_session()
+#     load_player_deck(team_color)
+#     check_for_ai_teams()
+#
+#     # general options checked
+#     if "exhaustion_reminder" in request.form:
+#         session["is_exhaustion_reminder"] = request.form["exhaustion_reminder"]
+#
+#     if "view_played" in request.form:
+#         session["view_played"] = request.form["view_played"]
+#
+#     # begin dealing with breakaway options
+#     if "breakaway_option" in request.form:
+#         # setup the breakaway variables
+#         session["breakaway_option"] = request.form["breakaway_option"]
+#         session.modified = True
+#         return render_template("breakaway/breakaway_deck_choice.html")
+#     session.modified = True
+#     return redirect(url_for("choose_deck"))
