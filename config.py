@@ -47,7 +47,7 @@ basedir_os = os.path.abspath(os.path.dirname(__file__))
 sqlite_url = "sqlite:////" + os.path.join(basedir_os, "flamme_rouge.db")
 
 # Configure the SqlAlchemy part of the app instance
-app.config["SQLALCHEMY_ECHO"] = True
+app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = sqlite_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["USE_SESSION_FOR_NEXT"] = True

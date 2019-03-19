@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1>Member Page</h1>
+
+<p><strong>Name: </strong> {{ current_user.username }}</p>
+<p><strong>Email: </strong> {{ current_user.email }}</p>
+<p><strong>Member type: </strong> {{ current_user.account_type }}</p>
+
+{% if current_user.account_type == 'admin' %}
+    <p><a href="{{ url_for("admin.admin_home")}}" class="btn btn-primary" role="button">Admin page</a></p>
+{% endif %}
+{% if current_user.account_type == 'admin' or current_user.account_type == 'organizer' %}
+    <p><a href="{{ url_for("member.create_game_form")}}" class="btn btn-primary" role="button">Create Game</a></p>
+{% endif %}
+
+<table class="table table-striped table-dark">
+    <tr>
+        <th>
+            Game ID
+        </th>
+        <th>
+            Game Name
+        </th>
+        <th>
+            Round
+        </th>
+        <th>
+            Play Next Round
+        </th>
+    </tr>
+
+    {# iterate over the games the user is part of #}
+    {% for game in user.games %}
+        <tr>
+            <td>{{ game.id }}</td>
+            <td>{{ game.name }}</td>
+
+            {# does the game.turns list contain anything? #}
+            {% if game.turns %}
+                <td>
+                    {# use the 0 index cause that's the current round from the query #}
+                    {{ game.turns[0].current_round }}
+                </td>
+                <td>
+                    <a href="/member/play_next_turn/{{ game.turns[0].id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
+                </td>
+
+            {# otherwise, don't have any turns for this user/game combination #}
+            {% else %}
+                <td>
+                    <a href="/member/initial_PBEM_turn/{{ game.id }}" class="btn btn-primary btn-sm" role="button">Start Game</a>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-secondary btn-sm" role="button">Waiting for Opponents</a>
+                </td>
+            {% endif %}
+
+        </tr>
+    {% endfor %}
+</table>
+
+<div class="row">
+    <div class="col-6">
+        <div class="card text-white bg-secondary p-3" style="max-width: 18rem;">
+    <!-- <div class="col-4 col-sm-2"> -->
+            <form action="{{ url_for("member.join_game")}}" method="POST">
+                <div class="form-group">
+                    <label class="mr-2" for="join_game">Join Game:</label>
+                    <input type="join_game" name="join_game" class="form-control mr-2" id="join_game" aria-describedby="join_game">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

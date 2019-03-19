@@ -80,36 +80,44 @@ def member_page():
     )
 
 
-# preserved member page so I don't blow the whole thing
-# @member.route("/member_page")
-# @login_required
-# def member_page():
-#     # only for testing purposes
-#     session["PBEM"] = True
-#     current_turn_info = (
-#         TurnInfo.query.filter_by(user_id=current_user.id)
-#         .order_by(TurnInfo.id.desc())
-#         .first()
-#     )
-#
-#
-#     # changed this to use the version that passes a user id
-#     users = controller.get_users(current_user.id)
-#
-#     # did we get a list of users?
-#     if users:
-#         user = users[0]
-#
-#     # log the list of games to stdout
-#     logger.debug("Here is the user list returned for this user")
-#     logger.debug(user)
-#
-#
-#     return render_template(
-#         "member/member_page.html",
-#         current_turn_info=current_turn_info,
-#         user=user
-#     )
+# This is a mirror of your 'member_page_doug' and you can see
+# this work by navigating to /member_page_doug.
+@member.route("/member_page_doug")
+@login_required
+def member_page_doug():
+    # only for testing purposes
+    session["PBEM"] = True
+
+    # I removed the query that was here as you can just
+    # use the function you have that returns the user_id
+    # from the session.
+
+    # use the currently logged in user id value to get the user
+    users = controller.get_users(current_user.id)
+
+    # did we get a list of users?
+    if users:
+
+        # get the single user we expect from that list
+        user = users[0]
+
+    # log the user to stdout
+    logger.debug(f"Here is the user data returned for this user.id = {current_user.id}")
+    logger.debug(user)
+
+    # iterate over the user's games
+    for game in user.games:
+
+        # get the turns associated with the user's games
+        turns = controller.get_turns(user.id, game.id)
+
+        # append the list of turns to this user game
+        game.turns = turns
+
+    return render_template(
+        "member/member_page_doug.html",
+        user=user
+    )
 
 
 @member.route("/logout")
