@@ -47,10 +47,8 @@ def member_login():
 @member.route("/member_page")
 @login_required
 def member_page():
-    # only for testing purposes
-    # session["PBEM"] = True
-    if session.get("round"):
-        session.pop("round")
+    # remove session keys, keep the flashed messages though
+    [session.pop(key) for key in list(session.keys()) if key != '_flashes']
     # create blank list to fill with game info
     member_games_info = []
 
