@@ -210,7 +210,7 @@ input[type=radio]:checked + label>div {
 
 
 /*-------------------- footer ------------------------------------*/
-footer {
+.footer {
     position: relative;
     bottom: 0;
     width: 100%;
