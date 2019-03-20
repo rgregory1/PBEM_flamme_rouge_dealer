@@ -46,7 +46,9 @@
             {% if game.current_round == 0 %}
                 <a href="/member/initial_PBEM_turn/{{ game.game_id }}" class="btn btn-primary btn-sm" role="button">Start Game</a>
             {% elif game.same_turn %}
-                <a href="/member/play_next_turn/{{ game.turn_id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
+
+                <a href="/member/round_summary/{{ game.game_id }}/{{ game.turn_id }}" class="btn btn-primary btn-sm" role="button">View Turn Results</a>
+                <!--<a href="/member/play_next_turn/{{ game.turn_id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>-->
             {% else %}
                 <a href="#" class="btn btn-secondary btn-sm" role="button">Waiting for Opponents</a>
             {% endif%}

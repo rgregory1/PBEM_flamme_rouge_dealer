@@ -157,3 +157,33 @@ def get_latest_turn(game_id, user_id):
         .first()
     )
     return latest_turn_info
+
+def test_for_same_turn(game_id):
+        # begin query to find all players last turn
+        # return dict of game info
+        current_game_users = get_games_users_dict(game_id)
+
+        # save the list of user dicts
+        user_list = current_game_users[0]['users']
+
+        # initiate list to store max turn numbers
+        max_turn_list = []
+
+        for user in user_list:
+            # iterate over each user to find max turn for this game
+            max_turn = get_latest_turn(game_id, user['id'])
+            # if user hasn't played a turn, none is returned, change that to zero
+            if max_turn == None:
+                max_turn_number = 0
+            else:
+                max_turn_number = max_turn.current_round
+            # append this users turn to list
+            max_turn_list.append(max_turn_number)
+
+        # test to see if all users have same turn number
+        if(len(set(max_turn_list))==1):
+            same_turn = True
+        else:
+            same_turn = False
+
+        return same_turn

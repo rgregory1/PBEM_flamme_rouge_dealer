@@ -2,7 +2,7 @@
 /* ------------------------ general styles ------------------------*/
 body {
     background-color: #E7E7C9;
-    padding-bottom: 50px;
+    /* padding-bottom: 50px;*/
 }
 
 /* ------------------------ display played card options ------------------------*/
@@ -206,6 +206,19 @@ input[type=radio]:checked + label>div {
 
 .team-color-choice-btns {
     width: 150px;
+}
+
+
+/*-------------------- footer ------------------------------------*/
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    /* height: 60px;
+    line-height: 60px; */
+    background-color: #f5f5f5;
+    margin-top: 50px;
+    margin-bottom: -20px;
 }
 
 /* -------------- media queries to adjust styles for phones --------------*/

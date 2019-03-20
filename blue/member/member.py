@@ -48,7 +48,7 @@ def member_login():
 @login_required
 def member_page():
     # remove session keys, keep the flashed messages though
-    [session.pop(key) for key in list(session.keys()) if key != '_flashes']
+    [session.pop(key) for key in list(session.keys()) if key != "_flashes"]
     # create blank list to fill with game info
     member_games_info = []
 
@@ -66,54 +66,14 @@ def member_page():
         # return the last turns number
         this_turn_data = controller.get_latest_turn(game["id"], current_user.id)
 
-        # ------------------------------------------------------------------------
-
-        # begin query to find all players last turn
-        # return dict of game info
-        current_game_users = controller.get_games_users_dict(game['id'])
-        # print('\n\nhere are the current users')
-        # print('for game id:')
-        # print(game['id'])
-        # print(current_game_users)
-
-        # save the list of user dicts
-        user_list = current_game_users[0]['users']
-        # print('\n\nhere is the user_list')
-        # pprint(user_list)
-
-        max_turn_list = []
-        for user in user_list:
-            max_turn = controller.get_latest_turn(game['id'], user['id'])
-            if max_turn == None:
-                max_turn_number = 0
-                # print(f"user {user['id']} max turn:")
-                # print(max_turn)
-            else:
-                # print(f"user {user['id']} max turn:")
-                # print(max_turn.current_round)
-                max_turn_number = max_turn.current_round
-            max_turn_list.append(max_turn_number)
-
-        # print("\nmax_turn_list")
-        # print(max_turn_list)
-        if(len(set(max_turn_list))==1):
-            this_game_info['same_turn'] = True
-        else:
-            this_game_info['same_turn'] = False
-        # print(f" this game {game['id']} has a same turn status of {this_game_info['same_turn']}")
-
-
-        # _this_game_object = controller.get_games(game['id'])
-        # this_game_object = _this_game_object[0]
-        # print(this_game_object)
-        # ------------------------------------------------------------------------
+        # test to see if all players are on the same turn
+        this_game_info["same_turn"] = controller.test_for_same_turn(game["id"])
 
         # assign
         if this_turn_data:
             this_game_info["current_round"] = this_turn_data.current_round
             this_game_info["turn_id"] = this_turn_data.id
         else:
-            # this_game_info["current_round"] = None
             this_game_info["current_round"] = 0
 
         member_games_info.append(this_game_info)
@@ -157,10 +117,7 @@ def member_page_doug():
         # append the list of turns to this user game
         game.turns = turns
 
-    return render_template(
-        "member/member_page_doug.html",
-        user=user
-    )
+    return render_template("member/member_page_doug.html", user=user)
 
 
 @member.route("/logout")
@@ -278,28 +235,32 @@ def initial_PBEM_turn(game_id):
     return render_template("member/PBEM_home.html")
 
 
-# @member.route("/setup", methods=["POST", "GET"])
-# @login_required
-# def setup():
-#     # collect form info
-#     team_color = request.form["team_color"]
-#
-#     initialize_session()
-#     load_player_deck(team_color)
-#     check_for_ai_teams()
-#
-#     # general options checked
-#     if "exhaustion_reminder" in request.form:
-#         session["is_exhaustion_reminder"] = request.form["exhaustion_reminder"]
-#
-#     if "view_played" in request.form:
-#         session["view_played"] = request.form["view_played"]
-#
-#     # begin dealing with breakaway options
-#     if "breakaway_option" in request.form:
-#         # setup the breakaway variables
-#         session["breakaway_option"] = request.form["breakaway_option"]
-#         session.modified = True
-#         return render_template("breakaway/breakaway_deck_choice.html")
-#     session.modified = True
-#     return redirect(url_for("choose_deck"))
+@member.route("/round_summary/<game_id>/<turn_id>", methods=["Post", "GET"])
+@login_required
+def round_summary(game_id, turn_id):
+    # begin query to find all players last turn
+    # return dict of game info
+    current_game_users = controller.get_games_users_dict(game_id)
+
+    # save the list of user dicts
+    user_list = current_game_users[0]["users"]
+
+    # initiate list to store max turn numbers
+    user_info_list = []
+
+    for user in user_list:
+        this_user_data = {}
+        # iterate over each user to their turn data
+        this_user_turn = controller.get_latest_turn(game_id, user["id"])
+        print(this_user_turn)
+        # load summary_data into list
+        this_user_data['chosen_cards'] = json.loads(this_user_turn.summary_data)
+
+        _quick_user = controller.get_users(user['id'])
+        quick_user = _quick_user[0]
+        this_user_data['user_name'] = quick_user.username
+
+        user_info_list.append(this_user_data)
+    round_number = this_user_turn.current_round
+
+    return render_template("member/round_summary.html", turn_id=turn_id, user_info_list=user_info_list, round_number=round_number)

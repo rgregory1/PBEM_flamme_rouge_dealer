@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="row">
+    <div class="col offset-sm-3 mb-5">
+        <h1 class="bd-title">Round {{ round_number }} Summary</h1>
+    </div>
+</div>
+
+    {% for user in user_info_list %}
+
+        <div class="row mb-3">
+            <div class="col-sm-3">
+                <h3 class="text-center">
+                    {{ user['user_name'] }}
+                </h3>
+            </div>
+            <div class="col-sm-3 col-6">
+                <div class="card-shape {{ user['chosen_cards'][0][2] }}">
+                    <span class="
+                        {% if "S" == user['chosen_cards'][0][1] %}
+                            mini-letter
+                        {% else %}mini-letter-square
+                        {% endif %}">{{ user['chosen_cards'][0][1] }}</span>
+                    <p>{{ user['chosen_cards'][0][0] }}</p>
+                </div>
+
+            </div>
+
+            <div class="col-sm-3 col-6">
+                <div class="card-shape {{ user['chosen_cards'][1][2] }}">
+                    <span class="{% if "S" == user['chosen_cards'][1][1] %}
+                        mini-letter
+                    {% else %}mini-letter-square
+                    {% endif %}">{{ user['chosen_cards'][1][1] }}</span>
+                    <p>{{ user['chosen_cards'][1][0] }}</p>
+                </div>
+
+            </div>
+        </div>
+    {% endfor %}
+
+
+        </div><!--endrow-->
+        <div class="row mt-5 justify-content-center">
+
+        <!--saving old button if needed-->
+        <!--<a href="{{ url_for('choose_deck') }}" id="next_button" class="btn btn-primary btn-lg"{% if session["is_exhaustion_reminder"] %} data-toggle="modal" data-target="#exhaustion-checker-modal"{% endif %}>Begin Round {{ next_round }}</a>-->
+
+        <a href="/member/play_next_turn/{{ turn_id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
+
+        </div><!--endrow-->
+
+
+    </form>
+
+
+
+
+
+{% endblock %}
+
+
+{% block script %}
+
+<!--<script type="text/javascript">-->
+    <!--$(document).ready(function(){-->
+        <!--$('.exhaust-button').on('click', function() {-->
+
+            <!--var deck_id = $(this).attr('id');-->
+            <!--var dingDing = new Audio('{{ url_for('static', filename='sounds/bike-bell.mp3') }}')-->
+            <!--var buttonText-->
+
+            <!--if ( $('#'+deck_id).hasClass( "add-exhaust" ) ){-->
+                <!--var action = 'add';-->
+                <!--buttonText = 'Exhaustion<br>Added';-->
+            <!--} else {-->
+                <!--var action = 'remove';-->
+                <!--buttonText = 'Add<br>Exhaustion';-->
+            <!--}-->
+
+            <!--req = $.ajax({-->
+                <!--url: '/add_exhaustion',-->
+                <!--type: 'POST',-->
+                <!--data : { deck_id : deck_id, action : action }-->
+            <!--});-->
+
+
+
+            <!--$('#'+deck_id).fadeOut(function(){-->
+                <!--$('#'+deck_id).html( buttonText );-->
+
+                <!--if ( $('#'+deck_id).hasClass( "add-exhaust" ) ){-->
+                    <!--$('#'+deck_id).removeClass( "add-exhaust" ).removeClass( "btn-secondary" ).addClass( "btn-danger" );-->
+                <!--} else {-->
+                    <!--$('#'+deck_id).addClass( "add-exhaust" ).removeClass( "btn-danger" ).addClass( "btn-secondary" );-->
+                <!--}-->
+
+                <!--// $('#'+deck_id).attr("id", deck_id+'_remove');-->
+
+            <!--}).fadeIn();-->
+
+            <!--$('#next_button').removeAttr('data-toggle');-->
+            <!--dingDing.play();-->
+        <!--});-->
+    <!--});-->
+<!--</script>-->
+
+{% endblock %}
