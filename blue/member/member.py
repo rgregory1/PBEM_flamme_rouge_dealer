@@ -66,36 +66,55 @@ def member_page():
         # return the last turns number
         this_turn_data = controller.get_latest_turn(game["id"], current_user.id)
 
+        # ------------------------------------------------------------------------
+
         # begin query to find all players last turn
-        # current_game_users = controller.get_games_users_dict(game['id'])
+        # return dict of game info
+        current_game_users = controller.get_games_users_dict(game['id'])
         # print('\n\nhere are the current users')
         # print('for game id:')
         # print(game['id'])
         # print(current_game_users)
-        #
-        # user_list = current_game_users[0]['users']
-        # print('\n\nhere is the user_list')
-        # print(user_list)
-        #
-        # for user in user_list:
-        #     max_turn = controller.get_latest_turn(game['id'], user['id'])
-        #     if max_turn == None:
-        #         max_turn = 0
-        #         print('max_turn ')
-        #         print(max_turn)
-        #     else:
-        #         print(max_turn.current_round)
 
-        _this_game_object = controller.get_games(game['id'])
-        this_game_object = _this_game_object[0]
-        print(this_game_object)
+        # save the list of user dicts
+        user_list = current_game_users[0]['users']
+        # print('\n\nhere is the user_list')
+        # pprint(user_list)
+
+        max_turn_list = []
+        for user in user_list:
+            max_turn = controller.get_latest_turn(game['id'], user['id'])
+            if max_turn == None:
+                max_turn_number = 0
+                # print(f"user {user['id']} max turn:")
+                # print(max_turn)
+            else:
+                # print(f"user {user['id']} max turn:")
+                # print(max_turn.current_round)
+                max_turn_number = max_turn.current_round
+            max_turn_list.append(max_turn_number)
+
+        # print("\nmax_turn_list")
+        # print(max_turn_list)
+        if(len(set(max_turn_list))==1):
+            this_game_info['same_turn'] = True
+        else:
+            this_game_info['same_turn'] = False
+        # print(f" this game {game['id']} has a same turn status of {this_game_info['same_turn']}")
+
+
+        # _this_game_object = controller.get_games(game['id'])
+        # this_game_object = _this_game_object[0]
+        # print(this_game_object)
+        # ------------------------------------------------------------------------
 
         # assign
         if this_turn_data:
             this_game_info["current_round"] = this_turn_data.current_round
             this_game_info["turn_id"] = this_turn_data.id
         else:
-            this_game_info["current_round"] = None
+            # this_game_info["current_round"] = None
+            this_game_info["current_round"] = 0
 
         member_games_info.append(this_game_info)
 

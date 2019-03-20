@@ -36,13 +36,16 @@
         <tr>
             <td>{{ game.game_id }}</td>
             <td>{{ game.name }}</td>
-            {% if game.current_round %}
+            <!--{% if game.current_round %}-->
+                <!--<td>{{ game.current_round }}</td>-->
+            <!--{% else %}-->
+                <!--<td><a href="/member/initial_PBEM_turn/{{ game.game_id }}" class="btn btn-primary btn-sm" role="button">Start Game</a></td>-->
+            <!--{% endif %}-->
                 <td>{{ game.current_round }}</td>
-            {% else %}
-                <td><a href="/member/initial_PBEM_turn/{{ game.game_id }}" class="btn btn-primary btn-sm" role="button">Start Game</a></td>
-            {% endif %}
             <td>
-            {% if game.current_round %}
+            {% if game.current_round == 0 %}
+                <a href="/member/initial_PBEM_turn/{{ game.game_id }}" class="btn btn-primary btn-sm" role="button">Start Game</a>
+            {% elif game.same_turn %}
                 <a href="/member/play_next_turn/{{ game.turn_id }}" class="btn btn-primary btn-sm" role="button">Play Next Round</a>
             {% else %}
                 <a href="#" class="btn btn-secondary btn-sm" role="button">Waiting for Opponents</a>
