@@ -66,6 +66,30 @@ def member_page():
         # return the last turns number
         this_turn_data = controller.get_latest_turn(game["id"], current_user.id)
 
+        # begin query to find all players last turn
+        # current_game_users = controller.get_games_users_dict(game['id'])
+        # print('\n\nhere are the current users')
+        # print('for game id:')
+        # print(game['id'])
+        # print(current_game_users)
+        #
+        # user_list = current_game_users[0]['users']
+        # print('\n\nhere is the user_list')
+        # print(user_list)
+        #
+        # for user in user_list:
+        #     max_turn = controller.get_latest_turn(game['id'], user['id'])
+        #     if max_turn == None:
+        #         max_turn = 0
+        #         print('max_turn ')
+        #         print(max_turn)
+        #     else:
+        #         print(max_turn.current_round)
+
+        _this_game_object = controller.get_games(game['id'])
+        this_game_object = _this_game_object[0]
+        print(this_game_object)
+
         # assign
         if this_turn_data:
             this_game_info["current_round"] = this_turn_data.current_round

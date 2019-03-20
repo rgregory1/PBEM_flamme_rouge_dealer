@@ -70,6 +70,18 @@ def get_turns(user_id=None, game_id=None):
     turns = query.all()
     return turns
 
+def get_this_turns(game_id):
+    query = TurnInfo.query
+
+    # filter by game number?
+    if user_id is not None and game_id is not None:
+        query = query \
+            .filter(TurnInfo.game_id == game_id) \
+            .order_by(TurnInfo.current_round.desc())
+
+    # run the query
+    turns = query.all()
+    return turns
 
 def get_users_dict(user_id=None):
     _users_dict = get_users(user_id)
@@ -101,9 +113,43 @@ def get_users_dict(user_id=None):
     return users_dict
 
 
+def get_games_users_dict(game_id=None):
+
+   # convert the get_games call to a dict
+
+    # call the controller to get the games that match our requirements
+    _games = get_games(game_id=game_id)
+
+    # convert the list of games objects to a list of dictionaries
+    games = [
+        {
+            "id": game.id,
+            "creator": game.creator,
+            "name": game.name,
+            "active": game.active,
+            "limit": game.limit,
+            "options": game.options,
+            "users": [
+                {
+                    "id": user.id,
+                    "username": user.username,
+                    "password": user.password,
+                    "email": user.email,
+                    "account_type": user.account_type,
+                }
+                for user in game.users
+            ],
+        }
+        for game in _games
+    ]
+
+    return games
+
+
+
 def get_latest_turn(game_id, user_id):
-    print(game_id)
-    print(user_id)
+    # print(game_id)
+    # print(user_id)
     latest_turn_info = (
         TurnInfo.query.filter_by(game_id=game_id)
         .filter_by(user_id=user_id)

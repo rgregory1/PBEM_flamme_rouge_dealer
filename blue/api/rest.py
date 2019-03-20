@@ -43,6 +43,8 @@ def get_games(game_id=None):
         }
         for game in _games
     ]
+
+
     response = make_response(jsonify(games), 200)
     response.headers["Content-Type"] = "application/json"
     return response
