@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# email credentials
+credentials.py
+
 # mac stuff
 .DS_Store
 static/.DS_Store
