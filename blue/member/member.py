@@ -62,12 +62,10 @@ def member_page():
         # id and game name
         this_game_info["game_id"] = game["id"]
         this_game_info["name"] = game["name"]
+
         # use game id to see if data for game is stored in TurnInfo table if it's there,
         # return the last turns number
         this_turn_data = controller.get_latest_turn(game["id"], current_user.id)
-
-        # test to see if all players are on the same turn
-        this_game_info["same_turn"] = controller.test_for_same_turn(game["id"])
 
         # assign
         if this_turn_data:
@@ -76,7 +74,29 @@ def member_page():
         else:
             this_game_info["current_round"] = 0
 
+
+        # test to see if all players are on the same turn and find out if current player is ahead or behind
+        this_game_info["same_turn"] = controller.test_for_same_turn(game["id"])
+
+        this_game_info["opponent_progress"] = controller.get_opponent_progress(
+            game["id"], current_user.id
+        )
+
+        # test to see if current player is ahead or behind the latest turn
+
+        this_game_info['need_to_play'] = False
+
+        for player in this_game_info['opponent_progress']:
+            if this_game_info['current_round'] < player[1]:
+                this_game_info['need_to_play'] = True
+                break
+
+        pprint(this_game_info)
+
+
         member_games_info.append(this_game_info)
+
+        # this_game_info['current_round'] =
 
     return render_template(
         "member/member_page.html", member_games_info=member_games_info
@@ -143,6 +163,14 @@ def save_turn():
     )
     db.session.add(turn_data)
     db.session.commit()
+
+    # test to see if all players are on the same turn
+
+    game_name = controller.get_game_name(session['game_id'])
+    same_turn = controller.test_for_same_turn(session["game_id"])
+    if same_turn:
+        controller.send_mail(game_name, session['round'])
+
     return redirect(url_for("member.member_page"))
 
 
@@ -242,6 +270,8 @@ def round_summary(game_id, turn_id):
     # return dict of game info
     current_game_users = controller.get_games_users_dict(game_id)
 
+    game_name = current_game_users[0]["name"]
+
     # save the list of user dicts
     user_list = current_game_users[0]["users"]
 
@@ -254,13 +284,19 @@ def round_summary(game_id, turn_id):
         this_user_turn = controller.get_latest_turn(game_id, user["id"])
         print(this_user_turn)
         # load summary_data into list
-        this_user_data['chosen_cards'] = json.loads(this_user_turn.summary_data)
+        this_user_data["chosen_cards"] = json.loads(this_user_turn.summary_data)
 
-        _quick_user = controller.get_users(user['id'])
+        _quick_user = controller.get_users(user["id"])
         quick_user = _quick_user[0]
-        this_user_data['user_name'] = quick_user.username
+        this_user_data["user_name"] = quick_user.username
 
         user_info_list.append(this_user_data)
     round_number = this_user_turn.current_round
 
-    return render_template("member/round_summary.html", turn_id=turn_id, user_info_list=user_info_list, round_number=round_number)
+    return render_template(
+        "member/round_summary.html",
+        turn_id=turn_id,
+        user_info_list=user_info_list,
+        round_number=round_number,
+        game_name=game_name,
+    )

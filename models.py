@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(30))
     account_type = db.Column(db.String(20))
     games = db.relationship("Game", secondary=game_to_user)
+    icon = db.Column(db.String(30))
 
     def __str__(self):
         return pformat(vars(self), indent=4, width=80)

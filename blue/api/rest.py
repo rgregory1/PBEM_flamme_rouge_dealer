@@ -37,6 +37,7 @@ def get_games(game_id=None):
                     "password": user.password,
                     "email": user.email,
                     "account_type": user.account_type,
+                    "icon": user.icon,
                 }
                 for user in game.users
             ],
@@ -71,6 +72,7 @@ def get_users(user_id=None):
             "password": user.password,
             "email": user.email,
             "account_type": user.account_type,
+            "icon": user.icon,
             "games": [
                 {
                     "id": game.id,

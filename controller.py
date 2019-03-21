@@ -1,5 +1,7 @@
 from models import Game, User, TurnInfo
 from sqlalchemy import desc
+import yagmail
+import credentials
 
 
 def get_games(game_id=None):
@@ -61,27 +63,30 @@ def get_turns(user_id=None, game_id=None):
 
     # should we filter by user and game?
     if user_id is not None and game_id is not None:
-        query = query \
-            .filter(TurnInfo.user_id == user_id) \
-            .filter(TurnInfo.game_id == game_id) \
+        query = (
+            query.filter(TurnInfo.user_id == user_id)
+            .filter(TurnInfo.game_id == game_id)
             .order_by(TurnInfo.current_round.desc())
+        )
 
     # run the query
     turns = query.all()
     return turns
+
 
 def get_this_turns(game_id):
     query = TurnInfo.query
 
     # filter by game number?
     if user_id is not None and game_id is not None:
-        query = query \
-            .filter(TurnInfo.game_id == game_id) \
-            .order_by(TurnInfo.current_round.desc())
+        query = query.filter(TurnInfo.game_id == game_id).order_by(
+            TurnInfo.current_round.desc()
+        )
 
     # run the query
     turns = query.all()
     return turns
+
 
 def get_users_dict(user_id=None):
     _users_dict = get_users(user_id)
@@ -95,6 +100,7 @@ def get_users_dict(user_id=None):
             "password": user.password,
             "email": user.email,
             "account_type": user.account_type,
+            "icon": user.icon,
             "games": [
                 {
                     "id": game.id,
@@ -115,7 +121,7 @@ def get_users_dict(user_id=None):
 
 def get_games_users_dict(game_id=None):
 
-   # convert the get_games call to a dict
+    # convert the get_games call to a dict
 
     # call the controller to get the games that match our requirements
     _games = get_games(game_id=game_id)
@@ -136,6 +142,7 @@ def get_games_users_dict(game_id=None):
                     "password": user.password,
                     "email": user.email,
                     "account_type": user.account_type,
+                    "icon": user.icon,
                 }
                 for user in game.users
             ],
@@ -144,7 +151,6 @@ def get_games_users_dict(game_id=None):
     ]
 
     return games
-
 
 
 def get_latest_turn(game_id, user_id):
@@ -158,32 +164,91 @@ def get_latest_turn(game_id, user_id):
     )
     return latest_turn_info
 
+
 def test_for_same_turn(game_id):
-        # begin query to find all players last turn
-        # return dict of game info
-        current_game_users = get_games_users_dict(game_id)
+    # begin query to find all players last turn
+    # return dict of game info
+    current_game_users = get_games_users_dict(game_id)
 
-        # save the list of user dicts
-        user_list = current_game_users[0]['users']
+    # save the list of user dicts
+    user_list = current_game_users[0]["users"]
 
-        # initiate list to store max turn numbers
-        max_turn_list = []
+    # initiate list to store max turn numbers
+    max_turn_list = []
 
-        for user in user_list:
+    for user in user_list:
+        # iterate over each user to find max turn for this game
+        max_turn = get_latest_turn(game_id, user["id"])
+        # if user hasn't played a turn, none is returned, change that to zero
+        if max_turn == None:
+            max_turn_number = 0
+        else:
+            max_turn_number = max_turn.current_round
+        # append this users turn to list
+        max_turn_list.append(max_turn_number)
+
+    # test to see if all users have same turn number
+    if len(set(max_turn_list)) == 1:
+        same_turn = True
+    else:
+        same_turn = False
+
+    return same_turn
+
+
+def get_opponent_progress(game_id, this_user):
+    # begin query to find all players last turn
+    # return dict of game info
+    current_game_users = get_games_users_dict(game_id)
+
+    # save the list of user dicts
+    user_list = current_game_users[0]["users"]
+
+    # initiate list to store max turn numbers
+    user_turn_data = []
+
+    for user in user_list:
+        if user["id"] != this_user:
+            username = user["username"]
+            icon = user["icon"]
             # iterate over each user to find max turn for this game
-            max_turn = get_latest_turn(game_id, user['id'])
+            max_turn = get_latest_turn(game_id, user["id"])
             # if user hasn't played a turn, none is returned, change that to zero
             if max_turn == None:
                 max_turn_number = 0
             else:
                 max_turn_number = max_turn.current_round
             # append this users turn to list
-            max_turn_list.append(max_turn_number)
+            user_turn_data.append([username, max_turn_number, icon])
+    print(user_turn_data)
+    return user_turn_data
 
-        # test to see if all users have same turn number
-        if(len(set(max_turn_list))==1):
-            same_turn = True
-        else:
-            same_turn = False
 
-        return same_turn
+def get_game_name(game_id):
+    _game = Game.query.filter(Game.id == game_id)
+    print('\n--------game info --------------\n')
+    print(_game)
+    game = _game[0]
+    return game.name
+
+def send_mail(game_name, round_number):
+    # setup credentials for sending email
+    gmail_user = credentials.gmail_user
+    gmail_password = credentials.gmail_password
+    yag = yagmail.SMTP(gmail_user, gmail_password)
+
+    # begin email notifications
+    contents = f"Turn {round_number} of {game_name} is ready to view."
+
+
+    html = '<a href="http://rgregory.pythonanywhere.com/member/member_page">Go To Member Page</a>'
+    yag.send(
+        [
+            "mrgregory1@gmail.com",
+            "rgregory@fnwsu.org",
+        ],
+        "FR-Dealer PBEM Turn Finished",
+        [contents, html],
+    )
+
+    return "emails sent"

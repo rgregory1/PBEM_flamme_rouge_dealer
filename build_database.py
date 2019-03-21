@@ -10,6 +10,7 @@ USERS = [
         "password": "password",
         "email": "notsure@gmail.com",
         "account_type": "organizer",
+        "icon": "usa.png",
         "games": ["Test Game One"],
     },
     {
@@ -17,6 +18,7 @@ USERS = [
         "password": "password",
         "email": "rgregory@fnwsu.org",
         "account_type": "member",
+        "icon": "united-kingdom.png",
         "games": ["Test Game One", "Test Game Two"],
     },
     {
@@ -24,6 +26,7 @@ USERS = [
         "password": "password",
         "email": "mrgregory1@gmail.com",
         "account_type": "admin",
+        "icon": "usa.png",
         "games": ["Test Game Two"],
     },
 ]
@@ -51,6 +54,7 @@ for person in USERS:
         password=person.get("password"),
         email=person.get("email"),
         account_type=person.get("account_type"),
+        icon=person.get("icon"),
     )
     db.session.add(p)
 db.session.commit()

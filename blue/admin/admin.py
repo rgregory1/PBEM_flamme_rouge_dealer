@@ -49,8 +49,9 @@ def create_user():
     password = request.form["password"]
     email = request.form["email"]
     account_type = request.form["account_type"]
+    icon = request.form["icon"]
     new_user = User(
-        username=username, password=password, email=email, account_type=account_type
+        username=username, password=password, email=email, account_type=account_type, icon=icon
     )
     db.session.add(new_user)
     db.session.commit()
