@@ -47,7 +47,8 @@
         </div>
     </nav>
 
-    <div class="container">
+    <!--<div class="container align-self-stretch">-->
+    <div class="container" style="flex: 0 1; height: 100vh;">
         <div class="row pt-1">
             <div class="col-md-2">
             {% if session['round'] %}
@@ -110,7 +111,11 @@
 
     </div>
 
-
+    <footer class="footer bg-dark text-white p-3">
+        <div class="container">
+            <p>dummy text to test footer</p>
+        </div>
+    </footer>
 
 
 
@@ -121,11 +126,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     {% block script %} {% endblock %}
-    <footer class="footer bg-dark text-white p-3">
-        <div class="container">
-            <p>dummy text to test footer</p>
-        </div>
-        </footer>
+
   </body>
 
 </html>

@@ -2,9 +2,14 @@
 /* ------------------------ general styles ------------------------*/
 body {
     background-color: #E7E7C9;
-    /* padding-bottom: 50px;*/
-    position: relative;
+    /* padding-bottom: 50px;
+    position: relative;*/
+
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
 }
+
 
 /* ------------------------ display played card options ------------------------*/
 .played_cards {
