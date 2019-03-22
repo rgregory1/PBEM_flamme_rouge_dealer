@@ -2,6 +2,7 @@ from models import Game, User, TurnInfo
 from sqlalchemy import desc
 import yagmail
 import credentials
+from pprint import pprint
 
 
 def get_games(game_id=None):
@@ -231,11 +232,23 @@ def get_game_name(game_id):
     game = _game[0]
     return game.name
 
-def send_mail(game_name, round_number):
+def send_mail(game_name, round_number, game_id, user_id):
     # setup credentials for sending email
     gmail_user = credentials.gmail_user
     gmail_password = credentials.gmail_password
     yag = yagmail.SMTP(gmail_user, gmail_password)
+
+    # get list of users emails
+    _users = get_games_users_dict(game_id)
+    users = _users[0]['users']
+    print("\n-----------users------------\n")
+    pprint(users)
+    user_emails = []
+    for user in users:
+        if user['id'] != user_id:
+            user_emails.append(user['email'])
+    print("\n-----------user emails------------\n")
+    print(user_emails)
 
     # begin email notifications
     contents = f"Turn {round_number} of {game_name} is ready to view."
@@ -243,10 +256,7 @@ def send_mail(game_name, round_number):
 
     html = '<a href="http://rgregory.pythonanywhere.com/member/member_page">Go To Member Page</a>'
     yag.send(
-        [
-            "mrgregory1@gmail.com",
-            "rgregory@fnwsu.org",
-        ],
+        user_emails,
         "FR-Dealer PBEM Turn Finished",
         [contents, html],
     )

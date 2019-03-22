@@ -171,3 +171,8 @@ def shuffle_and_draw(deck):
     # if hand is empty added exhaustion card so rider can move the 2 minimum
     if session["current_hand"] == []:
         session["current_hand"].append([2, "S", "exhaustion-card"])
+
+def find_total_exhaustion(freeze_state):
+    deck_1_exh = sum('exhaustion-card' in x for x in freeze_state['deck_1']['energy']) + sum('exhaustion-card' in x for x in freeze_state['deck_1']['recycled'])
+    deck_2_exh = sum('exhaustion-card' in x for x in freeze_state['deck_2']['energy']) + sum('exhaustion-card' in x for x in freeze_state['deck_2']['recycled'])
+    return [deck_1_exh, deck_2_exh]

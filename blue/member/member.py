@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from flask_login import login_user, login_required, current_user, logout_user
 import controller
-
+import functions
 from pprint import pprint
 
 
@@ -26,20 +26,25 @@ def load_user(user_id):
 def member_login():
     if request.method == "POST":
         username = request.form["username"]
+        password = request.form["password"]
         user = User.query.filter_by(username=username).first()
 
         if not user:
             return "user does not exixt"
 
-        login_user(user, remember=True)
+        if password == user.password:
 
-        if "next" in session:
-            next = session["next"]
+            login_user(user, remember=True)
 
-            if next is not None:
-                return redirect(next)
+            if "next" in session:
+                next = session["next"]
 
-        return redirect(url_for("member.member_page"))
+                if next is not None:
+                    return redirect(next)
+            return redirect(url_for("member.member_page"))
+        else:
+            flash("username and password do not match")
+        return redirect(url_for("member.member_login"))
     session["next"] = request.args.get("next")
     return render_template("member/login.html")
 
@@ -74,7 +79,6 @@ def member_page():
         else:
             this_game_info["current_round"] = 0
 
-
         # test to see if all players are on the same turn and find out if current player is ahead or behind
         this_game_info["same_turn"] = controller.test_for_same_turn(game["id"])
 
@@ -84,15 +88,14 @@ def member_page():
 
         # test to see if current player is ahead or behind the latest turn
 
-        this_game_info['need_to_play'] = False
+        this_game_info["need_to_play"] = False
 
-        for player in this_game_info['opponent_progress']:
-            if this_game_info['current_round'] < player[1]:
-                this_game_info['need_to_play'] = True
+        for player in this_game_info["opponent_progress"]:
+            if this_game_info["current_round"] < player[1]:
+                this_game_info["need_to_play"] = True
                 break
 
         pprint(this_game_info)
-
 
         member_games_info.append(this_game_info)
 
@@ -153,7 +156,10 @@ def save_turn():
     # freeze the state to come back to the beginning of the round
     freeze_state = dict(session)
     frozen_data = json.dumps(freeze_state)
-    summary_data = json.dumps(session["chosen_cards"])
+    _summary_data = {}
+    _summary_data["total_exhaustion"] = functions.find_total_exhaustion(freeze_state)
+    _summary_data["chosen_cards"] = session["chosen_cards"]
+    summary_data = json.dumps(_summary_data)
     turn_data = TurnInfo(
         user_id=current_user.id,
         game_id=session["game_id"],
@@ -166,10 +172,12 @@ def save_turn():
 
     # test to see if all players are on the same turn
 
-    game_name = controller.get_game_name(session['game_id'])
+    game_name = controller.get_game_name(session["game_id"])
     same_turn = controller.test_for_same_turn(session["game_id"])
     if same_turn:
-        controller.send_mail(game_name, session['round'])
+        controller.send_mail(
+            game_name, session["round"], session["game_id"], current_user.id
+        )
 
     return redirect(url_for("member.member_page"))
 
@@ -283,8 +291,11 @@ def round_summary(game_id, turn_id):
         # iterate over each user to their turn data
         this_user_turn = controller.get_latest_turn(game_id, user["id"])
         print(this_user_turn)
+
         # load summary_data into list
-        this_user_data["chosen_cards"] = json.loads(this_user_turn.summary_data)
+        prelim_summary_data = json.loads(this_user_turn.summary_data)
+        this_user_data["chosen_cards"] = prelim_summary_data["chosen_cards"]
+        this_user_data["total_exhaustion"] = prelim_summary_data["total_exhaustion"]
 
         _quick_user = controller.get_users(user["id"])
         quick_user = _quick_user[0]

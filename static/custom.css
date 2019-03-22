@@ -230,6 +230,14 @@ input[type=radio]:checked + label>div {
 }
 */
 
+/*-------------------- member page ------------------------------------*/
+
+.table-logo {
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+    }
+
 /* -------------- media queries to adjust styles for phones --------------*/
 
 @media (max-width: 360px) {

@@ -12,9 +12,13 @@
 
         <div class="row mb-3">
             <div class="col-sm-3">
-                <h3 class="text-center">
+                <h3>
                     {{ user['user_name'] }}
                 </h3>
+                <p>
+                    Sprinteur total Ex: {{ user["total_exhaustion"][0] }}<br>
+                    Rouleur total Ex: {{ user["total_exhaustion"][1] }}
+                </p>
             </div>
             <div class="col-sm-3 col-6">
                 <div class="card-shape {{ user['chosen_cards'][0][2] }}">
