@@ -221,14 +221,13 @@ def get_opponent_progress(game_id, this_user):
                 max_turn_number = max_turn.current_round
             # append this users turn to list
             user_turn_data.append([username, max_turn_number, icon])
-    print(user_turn_data)
+    
     return user_turn_data
 
 
 def get_game_name(game_id):
     _game = Game.query.filter(Game.id == game_id)
-    print('\n--------game info --------------\n')
-    print(_game)
+
     game = _game[0]
     return game.name
 
@@ -241,14 +240,12 @@ def send_mail(game_name, round_number, game_id, user_id):
     # get list of users emails
     _users = get_games_users_dict(game_id)
     users = _users[0]['users']
-    print("\n-----------users------------\n")
-    pprint(users)
+
     user_emails = []
     for user in users:
         if user['id'] != user_id:
             user_emails.append(user['email'])
-    print("\n-----------user emails------------\n")
-    print(user_emails)
+
 
     # begin email notifications
     contents = f"Turn {round_number} of {game_name} is ready to view."

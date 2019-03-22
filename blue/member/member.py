@@ -290,7 +290,6 @@ def round_summary(game_id, turn_id):
         this_user_data = {}
         # iterate over each user to their turn data
         this_user_turn = controller.get_latest_turn(game_id, user["id"])
-        print(this_user_turn)
 
         # load summary_data into list
         prelim_summary_data = json.loads(this_user_turn.summary_data)
