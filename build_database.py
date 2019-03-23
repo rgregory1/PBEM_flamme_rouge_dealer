@@ -32,8 +32,8 @@ USERS = [
 ]
 
 GAMES = [
-    {"creator": 3, "active": True, "limit": 3, "name": "Test Game One"},
-    {"creator": 2, "active": True, "limit": 5, "name": "Test Game Two"},
+    {"creator": 3, "active": True, "limit": 3, "name": "Test Game One", "allow_new": True},
+    {"creator": 2, "active": True, "limit": 5, "name": "Test Game Two", "allow_new": True},
 ]
 
 # Delete database file if it exists currently
@@ -66,6 +66,7 @@ for game in GAMES:
         name=game.get("name"),
         active=game.get("active"),
         limit=game.get("limit"),
+        allow_new=game.get("allow_new"),
         options=options,
     )
 

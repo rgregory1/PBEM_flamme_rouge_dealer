@@ -4,6 +4,7 @@ from flask_login import login_user, login_required, current_user, logout_user
 import controller
 import functions
 from pprint import pprint
+from functools import wraps
 
 
 # we need user from models, so we grab it here
@@ -20,6 +21,16 @@ member = Blueprint("member", __name__, template_folder="member")
 def load_user(user_id):
     # I like this style just because it's more explicit
     return User.query.filter(User.id == int(user_id)).first()
+
+def organizer_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        account_type = current_user.account_type
+        if account_type == "member":
+            return redirect(url_for("member.member_page"))
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @member.route("/login", methods=["GET", "POST"])
@@ -54,6 +65,7 @@ def member_login():
 def member_page():
     # remove session keys, keep the flashed messages though
     [session.pop(key) for key in list(session.keys()) if key != "_flashes"]
+
     # create blank list to fill with game info
     member_games_info = []
 
@@ -61,12 +73,22 @@ def member_page():
     _users = controller.get_users_dict(current_user.id)
     users = _users[0]
 
+    print("\n--------------line 74 users -------------\n")
+    pprint(users)
+
     for game in users["games"]:
         # create empty dict for each game
         this_game_info = {}
         # id and game name
         this_game_info["game_id"] = game["id"]
         this_game_info["name"] = game["name"]
+        this_game_info["allow_new"] = game["allow_new"]
+        this_game_info['limit'] = game['limit']
+
+        if current_user.account_type == "admin" or current_user.id == game["creator"]:
+            this_game_info["deactivate"] = True
+        else:
+            this_game_info["deactivate"] = False
 
         # use game id to see if data for game is stored in TurnInfo table if it's there,
         # return the last turns number
@@ -80,6 +102,8 @@ def member_page():
             this_game_info["current_round"] = 0
 
         # test to see if all players are on the same turn and find out if current player is ahead or behind
+        print("\n---------- game id --------------\n")
+        print(game['id'])
         this_game_info["same_turn"] = controller.test_for_same_turn(game["id"])
 
         this_game_info["opponent_progress"] = controller.get_opponent_progress(
@@ -97,9 +121,20 @@ def member_page():
 
         pprint(this_game_info)
 
-        member_games_info.append(this_game_info)
+        this_game_info['limit_reached'] = True
+        total_players = len(this_game_info['opponent_progress']) + 1
 
-        # this_game_info['current_round'] =
+        print("\n-----------limit------------\n")
+        print(this_game_info['limit'])
+        print(len(this_game_info['opponent_progress']))
+        print(this_game_info['opponent_progress'])
+        print("total players: " + str(total_players))
+        print(this_game_info)
+
+        if this_game_info['limit'] > total_players:
+            this_game_info['limit_reached'] = False
+
+        member_games_info.append(this_game_info)
 
     return render_template(
         "member/member_page.html", member_games_info=member_games_info
@@ -219,10 +254,12 @@ def create_game():
         name=race_name,
         active=True,
         limit=race_limit,
+        allow_new=True,
         options=frozen_options,
     )
     db.session.add(new_race)
     db.session.commit()
+
     return redirect(url_for("member.member_page"))
 
 
@@ -233,22 +270,43 @@ def join_game():
 
     # test if string is not empty and contains numbers
     if game_number is not "" and game_number.isdigit():
-        # test if game is in database
+
+        # test if game is in database, returns boolean
         game_on = (
             db.session.query(Game.id).filter_by(id=game_number).scalar() is not None
         )
+
+        # if found in db, continue
         if game_on:
-            # if game is in database, add user to game
-            try:
-                joiner = game_to_user.insert().values(
-                    game_id=game_number, user_id=current_user.id
-                )
-                # joiner = game_to_user(game_id=game_number, user_id=current_user.id)
-                db.session.execute(joiner)
-                db.session.commit()
-            except:
-                flash("Already registered")
-            return redirect(url_for("member.member_page"))
+
+            # grab game info from db for tests
+            _game_info = controller.get_games_users_dict(game_number)
+            game_info = _game_info[0]
+            print("\n-----------game info--------\n")
+            pprint(game_info)
+
+            # test if game is still allowing new players and is still under the player limit
+            print("\n--------------allow new-----------\n")
+            print(game_info['allow_new'])
+            print("\n-------------length users-----------\n")
+            print(len(game_info['users']))
+            print("\n--------------limit-----------\n")
+            print(game_info['limit'])
+            if game_info['allow_new'] and len(game_info['users']) < game_info['limit']:
+
+                # if all conditions satisfied, add user to game
+                try:
+                    joiner = game_to_user.insert().values(
+                        game_id=game_number, user_id=current_user.id
+                    )
+                    # joiner = game_to_user(game_id=game_number, user_id=current_user.id)
+                    db.session.execute(joiner)
+                    db.session.commit()
+                except:
+                    flash("Already registered")
+                return redirect(url_for("member.member_page"))
+            else:
+                flash('This game not accepting new players')
         else:
             flash("No such game")
     else:
@@ -310,3 +368,25 @@ def round_summary(game_id, turn_id):
         round_number=round_number,
         game_name=game_name,
     )
+
+@member.route("/close_game/<game_id>", methods=["GET"])
+@login_required
+@organizer_login_required
+def close_game(game_id):
+
+    game = Game.query.filter_by(id=game_id).first()
+    game.active = False
+    db.session.commit()
+
+    return redirect(url_for("member.member_page"))
+
+@member.route("/close_admission/<game_id>", methods=["GET"])
+@login_required
+@organizer_login_required
+def close_admission(game_id):
+    print("\n\n--------inside close admission------\n\n")
+    game = Game.query.filter_by(id=game_id).first()
+    game.allow_new = False
+    db.session.commit()
+
+    return redirect(url_for("member.member_page"))

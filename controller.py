@@ -35,6 +35,7 @@ def get_users(user_id=None):
     # start building the query to get all users
     query = User.query
 
+    # TODO filter the following results to weed out inactive games!!!!!!
     # should we filter down to a single user?
     if user_id is not None:
         query = query.filter(User.id == user_id)
@@ -109,13 +110,17 @@ def get_users_dict(user_id=None):
                     "name": game.name,
                     "active": game.active,
                     "limit": game.limit,
+                    "allow_new": game.allow_new,
                     "options": game.options,
                 }
-                for game in user.games
+                # TODO remove this code when the original query is filtered for active games
+                for game in user.games if game.active == True
+                # for game in user.games
             ],
         }
         for user in _users_dict
     ]
+
 
     return users_dict
 
@@ -136,6 +141,7 @@ def get_games_users_dict(game_id=None):
             "active": game.active,
             "limit": game.limit,
             "options": game.options,
+            "allow_new": game.allow_new,
             "users": [
                 {
                     "id": user.id,
@@ -221,7 +227,7 @@ def get_opponent_progress(game_id, this_user):
                 max_turn_number = max_turn.current_round
             # append this users turn to list
             user_turn_data.append([username, max_turn_number, icon])
-    
+
     return user_turn_data
 
 
@@ -231,6 +237,7 @@ def get_game_name(game_id):
     game = _game[0]
     return game.name
 
+
 def send_mail(game_name, round_number, game_id, user_id):
     # setup credentials for sending email
     gmail_user = credentials.gmail_user
@@ -239,23 +246,17 @@ def send_mail(game_name, round_number, game_id, user_id):
 
     # get list of users emails
     _users = get_games_users_dict(game_id)
-    users = _users[0]['users']
+    users = _users[0]["users"]
 
     user_emails = []
     for user in users:
-        if user['id'] != user_id:
-            user_emails.append(user['email'])
-
+        if user["id"] != user_id:
+            user_emails.append(user["email"])
 
     # begin email notifications
     contents = f"Turn {round_number} of {game_name} is ready to view."
 
-
     html = '<a href="http://rgregory.pythonanywhere.com/member/member_page">Go To Member Page</a>'
-    yag.send(
-        user_emails,
-        "FR-Dealer PBEM Turn Finished",
-        [contents, html],
-    )
+    yag.send(user_emails, "FR-Dealer PBEM Turn Finished", [contents, html])
 
     return "emails sent"

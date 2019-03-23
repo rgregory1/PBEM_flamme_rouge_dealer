@@ -43,3 +43,15 @@
     </form>
 
 {% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    $(document).ready(setup);
+
+    function setup () {
+        $("form").on("submit", function () {
+            $(this).find(":submit").prop("disabled", true);
+        });
+    }
+</script>
+{% endblock%}

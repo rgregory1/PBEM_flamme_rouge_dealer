@@ -30,13 +30,21 @@
         <th>
             Play Next Round
         </th>
+
+        <th>
+        {% if game['deactivate']%}
+            {% if game.allow_new and game.limit_reached == False %}
+                <a href="/member/close_admission/{{ game.game_id }}" class="btn btn-secondary btn-sm" role="button">Close Registration</a>
+            {% endif %}
+        {% endif %}
+        </th>
     </tr>
 
 
     <!-- Is this more what you're looking for? -->
 
         <tr>
-            <td>{{ game.name }}</td>
+            <td>{{ game.name }} - &#40;{{ game.game_id }}&#41;</td>
             <td><img src="{{ url_for('static', filename='flags/' + current_user.icon) }}" style="height: 20px; witdth: 20px; margin-right:10px;"/>
                 {{current_user.username}}</td>
             <!--{% if game.current_round %}-->
@@ -58,6 +66,13 @@
                 <a href="#" class="btn btn-secondary btn-sm" role="button">Waiting for Opponents</a>
             {% endif%}
             </td>
+
+            <td>
+                {% if game['deactivate'] %}
+               <a href="/member/close_game/{{ game.game_id }}" class="btn btn-danger btn-sm" role="button">Deactivate Game</a>
+                {% endif %}
+            </td>
+
         </tr>
         {% for member in game['opponent_progress'] %}
             <tr>
@@ -73,6 +88,9 @@
                 </td>
                  <td>
 
+                </td>
+
+                <td>
                 </td>
             </tr>
         {% endfor%}

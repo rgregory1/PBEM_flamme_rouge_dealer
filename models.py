@@ -72,6 +72,7 @@ class Game(UserMixin, db.Model):
     name = db.Column(db.String(30))
     active = db.Column(db.Boolean)
     limit = db.Column(db.Integer)
+    allow_new = db.Column(db.Boolean)
     users = db.relationship("User", secondary=game_to_user)
     options = db.Column(db.Text)
 
