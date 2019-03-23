@@ -9,6 +9,9 @@ __pycache__/
 # email credentials
 credentials.py
 
+# db files
+flamme_rouge.db
+
 # mac stuff
 .DS_Store
 static/.DS_Store
