@@ -15,6 +15,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required
 from flask_debugtoolbar import DebugToolbarExtension
+import credentials
 
 
 # create the application instance we'll use everywhere
@@ -25,7 +26,7 @@ app = Flask(__name__)
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 
 # Set the secret key to the debugtoolbar
-app.secret_key = "my_secret"
+app.secret_key = credentials.secret_key_var
 
 # the toolbar is only enabled in debug mode:
 app.debug = True
@@ -39,7 +40,7 @@ login_manager.login_view = "member.member_login"
 
 
 # set a 'SECRET_KEY' to enable the Flask session cookies
-app.config["SECRET_KEY"] = "not_very_secret"
+app.config["SECRET_KEY"] = credentials.secret_key_var_2
 
 # Build the Sqlite ULR for SqlAlchemy
 basedir = pathlib.Path(__file__).parent.resolve()

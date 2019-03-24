@@ -41,7 +41,8 @@ def member_login():
         user = User.query.filter_by(username=username).first()
 
         if not user:
-            return "user does not exixt"
+            flash("user does not exixt")
+            return redirect(url_for("member.member_login"))
 
         if password == user.password:
 
@@ -259,39 +260,34 @@ def create_game():
     )
     db.session.add(new_race)
     db.session.commit()
-
+    flash(f"Your game has been created successfully, to add game use the name '{race_name}'")
     return redirect(url_for("member.member_page"))
 
 
 @member.route("/join_game", methods=["POST", "Get"])
 @login_required
 def join_game():
-    game_number = request.form["join_game"]
+    game_name = request.form["join_game"].strip()
 
     # test if string is not empty and contains numbers
-    if game_number is not "" and game_number.isdigit():
+    if game_name is not "":
 
         # test if game is in database, returns boolean
         game_on = (
-            db.session.query(Game.id).filter_by(id=game_number).scalar() is not None
+            db.session.query(Game.id).filter_by(name=game_name).scalar() is not None
         )
 
         # if found in db, continue
         if game_on:
 
+            # grab game number for use next
+            game_number = controller.get_game_id(game_name)
+
             # grab game info from db for tests
             _game_info = controller.get_games_users_dict(game_number)
             game_info = _game_info[0]
-            print("\n-----------game info--------\n")
-            pprint(game_info)
 
             # test if game is still allowing new players and is still under the player limit
-            print("\n--------------allow new-----------\n")
-            print(game_info['allow_new'])
-            print("\n-------------length users-----------\n")
-            print(len(game_info['users']))
-            print("\n--------------limit-----------\n")
-            print(game_info['limit'])
             if game_info['allow_new'] and len(game_info['users']) < game_info['limit']:
 
                 # if all conditions satisfied, add user to game

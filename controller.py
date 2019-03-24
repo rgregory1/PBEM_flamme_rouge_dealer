@@ -237,6 +237,12 @@ def get_game_name(game_id):
     game = _game[0]
     return game.name
 
+def get_game_id(game_name):
+    _game = Game.query.filter(Game.name == game_name)
+
+    game = _game[0]
+    return game.id
+
 
 def send_mail(game_name, round_number, game_id, user_id):
     # setup credentials for sending email

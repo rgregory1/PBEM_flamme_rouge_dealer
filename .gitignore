@@ -11,6 +11,7 @@ credentials.py
 
 # db files
 flamme_rouge.db
+build_database_private.py
 
 # mac stuff
 .DS_Store
